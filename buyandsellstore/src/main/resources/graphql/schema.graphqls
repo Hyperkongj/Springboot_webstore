@@ -1,0 +1,59 @@
+type AddressOutput {
+    type: String!
+    street: String!
+    city: String!
+    state: String!
+    zip: Int!
+    country: String!
+}
+
+input Address {
+    type: String
+    street: String
+    city: String
+    state: String
+    zip: Int
+    country: String
+}
+
+type Query {
+    # A simple query to return a greeting message
+    hello: String
+    getUserById(userId: ID!): User
+}
+
+type User {
+    id: ID!
+    username: String!
+    email: String!
+    firstName: String
+    lastName: String
+    phone: Int!
+    billing: [AddressOutput]
+    shipping: [AddressOutput]
+}
+
+type Mutation {
+    # Mutation to handle user login
+    login(username: String!, password: String!): AuthResponse
+
+    # Mutation to handle user signup
+    signup(
+        username: String!
+        email: String!
+        password: String!
+        firstName: String!
+        lastName: String!
+        phone: Int!
+        isAdmin: Boolean!
+        billing: [Address]
+        shipping: [Address]
+    ): AuthResponse
+}
+
+# Response object for authentication-related mutations
+type AuthResponse {
+    success: Boolean!
+    message: String!
+    user: User
+}
