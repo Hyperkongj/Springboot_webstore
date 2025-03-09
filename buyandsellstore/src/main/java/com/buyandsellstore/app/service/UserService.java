@@ -16,4 +16,12 @@ public class UserService {
         return user != null && user.getPassword().equals(password) ? user : null; // Ideally hash the password
     }
 
+    public User createUser(User user) {
+//        System.out.println(user.toString());
+//        System.out.println(user.getUsername());
+//        if (userRepository.existsByUsername(user.getUsername())) {
+//            return null;
+//        }
+        return userRepository.save(user);
+    }
 }

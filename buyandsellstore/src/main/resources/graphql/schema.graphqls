@@ -19,7 +19,6 @@ input Address {
 type Query {
     # A simple query to return a greeting message
     hello: String
-    getUserById(userId: ID!): User
 }
 
 type User {
@@ -28,6 +27,7 @@ type User {
     email: String!
     firstName: String
     lastName: String
+    isSeller: Boolean
     phone: Int!
     billing: [AddressOutput]
     shipping: [AddressOutput]
@@ -45,7 +45,7 @@ type Mutation {
         firstName: String!
         lastName: String!
         phone: Int!
-        isAdmin: Boolean!
+        isSeller: Boolean!
         billing: [Address]
         shipping: [Address]
     ): AuthResponse
