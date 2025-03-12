@@ -74,5 +74,5 @@ public class PasswordResetService {
 
         return true;
     }
-    // You can add additional logic for updating the password after validation
+
 }

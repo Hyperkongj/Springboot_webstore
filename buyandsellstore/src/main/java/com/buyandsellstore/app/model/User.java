@@ -16,23 +16,23 @@ public class User {
     @Id
     private String id; // Unique identifier for MongoDB
 
-    private String username;
+    private String username; // Username for login
 
     @Indexed(unique = true)
-    private String email;
+    private String email; // User's email address
 
-    private String password;
-    private String firstName;
-    private String lastName;
+    private String password; // Hashed password
+    private String firstName; // First name of the user
+    private String lastName; // Last name of the user
     private int phone;
     private boolean isSeller;
 
     private List<Address> billing = new ArrayList<>();
     private List<Address> shipping = new ArrayList<>();
 
-    // Optional: if using a separate token mechanism, consider removing this field
     private String resetToken;
 
+    // Default Constructor
     public User() {
     }
 
