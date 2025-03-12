@@ -1,33 +1,57 @@
 package com.buyandsellstore.app.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a user stored in the "users" collection.
+ */
 @Document(collection = "users")
 public class User {
+
     @Id
     private String id; // Unique identifier for MongoDB
 
-    private String username; // Username for login
-    private String email;    // User's email address
-    private String password; // Hashed password
-    private String firstName; // First name of the user
-    private String lastName;  // Last name of the user
+    private String username;
+
+    @Indexed(unique = true)
+    private String email;
+
+    private String password;
+    private String firstName;
+    private String lastName;
     private int phone;
-    private boolean isSeller;  // Indicates if the user has admin privileges
+    private boolean isSeller;
 
     private List<Address> billing = new ArrayList<>();
     private List<Address> shipping = new ArrayList<>();
 
-    // Default Constructor
+    // Optional: if using a separate token mechanism, consider removing this field
+    private String resetToken;
+
     public User() {
     }
 
-    // Parameterized Constructor
-    public User(String username, String email, String password, String firstName, String lastName, int phone, boolean isSeller, List<Address> billing, List<Address> shipping) {
+    // Constructor without billing and shipping addresses
+    public User(String username, String email, String password, String firstName, String lastName, int phone,
+            boolean isSeller) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.isSeller = isSeller;
+    }
+
+    // Constructor with billing and shipping addresses
+    public User(String username, String email, String password, String firstName, String lastName, int phone,
+            boolean isSeller,
+            List<Address> billing, List<Address> shipping) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -38,15 +62,9 @@ public class User {
         this.billing = billing;
         this.shipping = shipping;
     }
-    public User(String username, String email, String password, String firstName, String lastName, int phone, boolean isSeller) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phone = phone;
-        this.isSeller = isSeller;
-    }
+
+    // Getters and Setters
+
     public String getId() {
         return id;
     }
@@ -127,6 +145,14 @@ public class User {
         this.shipping = shipping;
     }
 
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -140,6 +166,7 @@ public class User {
                 ", isSeller=" + isSeller +
                 ", billing=" + billing +
                 ", shipping=" + shipping +
+                ", resetToken='" + resetToken + '\'' +
                 '}';
     }
 }
