@@ -92,6 +92,14 @@ const LoginScreen = () => {
         </button>
       </form>
       {errorMessage && <p style={styles.error}>{errorMessage}</p>} {/* Error message */}
+      <p style={styles.forgotPassword}>
+        <button
+          onClick={() => navigate("/forgotpassword")}
+          style={styles.forgotPasswordButton}
+        >
+          Forgot Password?
+        </button>
+      </p>
       <p style={styles.signupText}>
         Don't have an account?{" "}
         <button
@@ -118,6 +126,16 @@ const styles = {
     cursor: "pointer",
   },
   error: { color: "red", marginTop: "10px" }, // Error message styling
+  forgotPassword: { marginTop: "15px", fontSize: "14px" },
+  forgotPasswordButton: {
+    background: "none",
+    border: "none",
+    color: "#007BFF",
+    textDecoration: "underline",
+    cursor: "pointer",
+    padding: "0",
+    fontSize: "14px",
+  },
   signupText: { marginTop: "15px", fontSize: "14px", color: "#333" },
   signupButton: {
     background: "none",

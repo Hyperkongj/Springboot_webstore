@@ -57,3 +57,17 @@ type AuthResponse {
     message: String!
     user: User
 }
+
+# For Forgot Password
+extend type Mutation {
+  forgotPassword(email: String!): String
+}
+# For Reset Password
+extend type Mutation {
+  resetPassword(token: String!, newPassword: String!): ResetPasswordResponse!
+}
+
+type ResetPasswordResponse {
+  success: Boolean!
+  message: String
+}

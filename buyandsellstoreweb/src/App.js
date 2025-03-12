@@ -19,6 +19,8 @@ import {
 } from "@apollo/client";
 import { UserProvider} from "./context/UserContext"; // Import UserProvider and useUserContext
 import omitDeep from "omit-deep-lodash"; //
+import ForgotPassword from "./screens/ForgotPasswordScreen";
+import ResetPassword from "./screens/ResetPasswordScreen";
 
 // Middleware to remove __typename from all requests
 const cleanTypenameLink = new ApolloLink((operation, forward) => {
@@ -47,6 +49,8 @@ const App = () => (
         <Routes>
           <Route path="/login" element={<LoginScreen />} />
           <Route path="/signup" element={<SignUpScreen />} />
+          <Route path="/forgotpassword" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>
