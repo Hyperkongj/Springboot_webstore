@@ -17,7 +17,8 @@ const ForgotPassword = () => {
       if (data.forgotPassword) {
         setSubmitted(true);
       } else {
-        setErrorMessage("There was an error processing your request.");
+        // Update error message if the email is not available.
+        setErrorMessage("No account associated with that email address.");
       }
     },
     onError: (error) => {
@@ -36,7 +37,7 @@ const ForgotPassword = () => {
       <h2 style={styles.title}>Forgot Password</h2>
       {submitted ? (
         <p style={styles.successMessage}>
-          If an account with that email exists, you will receive an email with instructions to reset your password.
+          An email has been sent to your email address with instructions to reset your password.
         </p>
       ) : (
         <form onSubmit={handleSubmit} style={styles.form}>
