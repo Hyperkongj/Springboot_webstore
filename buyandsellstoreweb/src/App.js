@@ -19,7 +19,7 @@ import {
 } from "@apollo/client";
 
 import omitDeep from "omit-deep-lodash";
-import { UserProvider, useUserContext } from "./context/UserContext"; // ✅
+import { UserProvider, useUserContext } from "./context/UserContext";
 
 import LoginScreen from "./screens/LoginScreen";
 import SignUpScreen from "./screens/SignUpScreen";
@@ -28,6 +28,7 @@ import ResetPassword from "./screens/ResetPasswordScreen";
 import HomeScreen from "./screens/HomeScreen";
 import BooksScreen from "./screens/BooksScreen";
 import HomeItemsScreen from "./screens/HomeItemsScreen";
+import Header from "./components/Header";
 
 // Clean __typename
 const cleanTypenameLink = new ApolloLink((operation, forward) => {
@@ -49,29 +50,47 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-
-// NEW COMPONENT for Routes
+// 🔸 Separated AppRoutes for better control
 const AppRoutes = () => {
   const { user } = useUserContext();
 
   return (
-    <Routes>
-      <Route path="/login" element={<LoginScreen />} />
-      <Route path="/signup" element={<SignUpScreen />} />
-      <Route path="/forgotpassword" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
+    <>
+      {/* Only show Header if user is logged in */}
+      {user && <Header />}
 
-      {/* Protected Routes */}
-      <Route path="/home" element={user ? <HomeScreen /> : <Navigate to="/login" replace />} />
-      <Route path="/books" element={user ? <BooksScreen /> : <Navigate to="/login" replace />} />
-      <Route path="/homeitems" element={user ? <HomeItemsScreen /> : <Navigate to="/login" replace />} />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<LoginScreen />} />
+        <Route path="/signup" element={<SignUpScreen />} />
+        <Route path="/forgotpassword" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
-      {/* Catch-all route */}
-      <Route path="*" element={<Navigate to={user ? "/home" : "/login"} replace />} />
-    </Routes>
+        {/* Protected Routes */}
+        <Route
+          path="/home"
+          element={user ? <HomeScreen /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/books"
+          element={user ? <BooksScreen /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/homeitems"
+          element={user ? <HomeItemsScreen /> : <Navigate to="/login" replace />}
+        />
+
+        {/* Catch-all: redirect based on login */}
+        <Route
+          path="*"
+          element={<Navigate to={user ? "/home" : "/login"} replace />}
+        />
+      </Routes>
+    </>
   );
 };
 
+// 🔸 App component
 const App = () => (
   <ApolloProvider client={client}>
     <UserProvider>
