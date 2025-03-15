@@ -19,6 +19,9 @@ input Address {
 type Query {
     # A simple query to return a greeting message
     hello: String
+    # Fetch a single book by its ID
+    book(id: ID!): Book
+    books: [Book!]!
 }
 
 type User {
@@ -70,4 +73,22 @@ extend type Mutation {
 type ResetPasswordResponse {
   success: Boolean!
   message: String
+}
+
+# Book type definition
+type Book {
+    id: ID! # Unique identifier for the book
+    title: String!
+    author: String!
+    price: Float!
+    imageUrl: String!
+    description: String
+    ratings: Float!
+    reviews: [Review!] # Now Review is defined
+}
+
+type Review {
+    reviewer: String!
+    comment: String!
+    rating: Float!
 }
