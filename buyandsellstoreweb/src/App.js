@@ -26,7 +26,7 @@ import ResetPassword from "./screens/ResetPasswordScreen";
 import HomeScreen from "./screens/HomeScreen";
 import HomeItemsScreen from "./screens/HomeItemsScreen";
 import Header from "./components/Header";
-
+import CartScreen from "./screens/CartScreen";
 // Import the books list and detail components
 import Books from "./screens/BooksScreen"; // List of books
 import Book from "./screens/BookDetailScreen";   // Book detail view
@@ -50,6 +50,12 @@ const client = new ApolloClient({
   link: from([cleanTypenameLink, httpLink]),
   cache: new InMemoryCache(),
 });
+
+// Protected Route component to check authentication
+const ProtectedRoute = ({ children }) => {
+  const { user } = useUserContext();
+  return user ? children : <Navigate to="/login" replace />;
+};
 
 // Separated AppRoutes for better control
 const AppRoutes = () => {
@@ -91,6 +97,14 @@ const AppRoutes = () => {
           path="*"
           element={<Navigate to={user ? "/home" : "/login"} replace />}
         />
+        <Route
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <CartScreen />
+              </ProtectedRoute>
+            }
+          />
       </Routes>
     </>
   );

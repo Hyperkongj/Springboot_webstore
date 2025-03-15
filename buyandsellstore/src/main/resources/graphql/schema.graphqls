@@ -19,6 +19,7 @@ input Address {
 type Query {
     # A simple query to return a greeting message
     hello: String
+    cartItems(id: ID!): [CartItem]
     # Fetch a single book by its ID
     book(id: ID!): Book
     books: [Book!]!
@@ -52,6 +53,10 @@ type Mutation {
         billing: [Address]
         shipping: [Address]
     ): AuthResponse
+
+    addToCart(userId: ID!, itemId: ID!, type: String!): ResponseMessage!
+    # Mutation to remove an item from the cart
+    removeFromCart(userId: ID!, itemId: ID, type: String): ResponseMessage!
 }
 
 # Response object for authentication-related mutations
@@ -87,8 +92,22 @@ type Book {
     reviews: [Review!] # Now Review is defined
 }
 
+type CartItem {
+    itemId: ID!
+    type: String # E.g., "book", "home", etc.
+    name: String
+    quantity: Int
+    price: Float
+    imageUrl: String
+}
+
 type Review {
     reviewer: String!
     comment: String!
     rating: Float!
+}
+
+type ResponseMessage {
+    success: Boolean!
+    message: String!
 }
