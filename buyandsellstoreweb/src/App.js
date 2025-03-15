@@ -1,5 +1,3 @@
-// App.js
-
 import React from "react";
 import "./App.css";
 import {
@@ -26,11 +24,14 @@ import SignUpScreen from "./screens/SignUpScreen";
 import ForgotPassword from "./screens/ForgotPasswordScreen";
 import ResetPassword from "./screens/ResetPasswordScreen";
 import HomeScreen from "./screens/HomeScreen";
-import BooksScreen from "./screens/BooksScreen";
 import HomeItemsScreen from "./screens/HomeItemsScreen";
 import Header from "./components/Header";
 
-// Clean __typename
+// Import the books list and detail components
+import Books from "./screens/BooksScreen"; // List of books
+import Book from "./screens/BookDetailScreen";   // Book detail view
+
+// Clean __typename from variables
 const cleanTypenameLink = new ApolloLink((operation, forward) => {
   if (operation.variables) {
     operation.variables = omitDeep(operation.variables, "__typename");
@@ -38,7 +39,7 @@ const cleanTypenameLink = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
-// GraphQL link
+// GraphQL link configuration
 const httpLink = new HttpLink({
   uri: "http://localhost:8080/graphql",
   credentials: "include",
@@ -50,13 +51,13 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-// 🔸 Separated AppRoutes for better control
+// Separated AppRoutes for better control
 const AppRoutes = () => {
   const { user } = useUserContext();
 
   return (
     <>
-      {/* Only show Header if user is logged in */}
+      {/* Render Header only if the user is logged in */}
       {user && <Header />}
 
       <Routes>
@@ -73,11 +74,16 @@ const AppRoutes = () => {
         />
         <Route
           path="/books"
-          element={user ? <BooksScreen /> : <Navigate to="/login" replace />}
+          element={user ? <Books /> : <Navigate to="/login" replace />}
         />
         <Route
           path="/homeitems"
           element={user ? <HomeItemsScreen /> : <Navigate to="/login" replace />}
+        />
+        {/* Book Detail Route */}
+        <Route
+          path="/book/:id"
+          element={user ? <Book /> : <Navigate to="/login" replace />}
         />
 
         {/* Catch-all: redirect based on login */}
@@ -90,7 +96,7 @@ const AppRoutes = () => {
   );
 };
 
-// 🔸 App component
+// App component
 const App = () => (
   <ApolloProvider client={client}>
     <UserProvider>
