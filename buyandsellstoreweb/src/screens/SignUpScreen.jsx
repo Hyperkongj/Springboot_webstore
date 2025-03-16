@@ -9,7 +9,7 @@ const SIGNUP_MUTATION = gql`
     $password: String!
     $firstName: String!
     $lastName: String!
-    $phone: Int!
+    $phone: String!
     $isSeller: Boolean!
     $billing: [Address]
     $shipping: [Address] 
@@ -20,13 +20,36 @@ const SIGNUP_MUTATION = gql`
       password: $password
       firstName: $firstName
       lastName: $lastName
-      isSeller: $isSeller
       phone: $phone
+      isSeller: $isSeller
       billing: $billing
       shipping: $shipping
     ) {
       success
       message
+      user {
+        id
+        username
+        email
+        firstName
+        lastName
+        isSeller
+        phone
+        billing {
+          street
+          city
+          state
+          zip
+          country
+        }
+        shipping {
+          street
+          city
+          state
+          zip
+          country
+        }
+      }
     }
   }
 `;
@@ -38,23 +61,39 @@ const SignUpScreen = () => {
     password: "",
     firstName: "",
     lastName: "",
-    phone: 1234567891,
+    phone: "",
     isSeller: false,
   });
-  const [errorMessage, setErrorMessage] = useState("");
+
+  const [errors, setErrors] = useState({
+    email: "",
+    phone: "",
+  });
+
   const [signup] = useMutation(SIGNUP_MUTATION);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+
+    if (name === "email") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      setErrors((prev) => ({
+        ...prev,
+        email: value && !emailRegex.test(value) ? "Invalid email format." : "",
+      }));
+    }
+
     if (name === "phone") {
       if (!/^\d{0,10}$/.test(value)) {
-        setErrorMessage("Phone number must be up to 10 digits.");
-        return;
-      } else {
-        setErrorMessage(""); // Clear the error if valid
+        return; // Prevent input update if it's invalid
       }
+      setErrors((prev) => ({
+        ...prev,
+        phone: value.length > 0 && value.length < 10 ? "Phone number must be 10 digits." : "",
+      }));
     }
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -63,15 +102,20 @@ const SignUpScreen = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+
+    if (errors.email || errors.phone) {
+      return; // Prevent submission if there are validation errors
+    }
+
     try {
       const response = await signup({ variables: { ...formData } });
       if (response.data.signup.success) {
         navigate("/login");
       } else {
-        setErrorMessage(response.data.signup.message);
+        setErrors((prev) => ({ ...prev, form: response.data.signup.message }));
       }
     } catch (error) {
-      setErrorMessage("An error occurred during sign-up.");
+      setErrors((prev) => ({ ...prev, form: "An error occurred during sign-up." }));
     }
   };
 
@@ -97,6 +141,8 @@ const SignUpScreen = () => {
           required
           style={styles.input}
         />
+        {errors.email && <p style={styles.error}>{errors.email}</p>}
+        
         <input
           type="password"
           name="password"
@@ -133,6 +179,8 @@ const SignUpScreen = () => {
           required
           style={styles.input}
         />
+        {errors.phone && <p style={styles.error}>{errors.phone}</p>}
+
         <label style={styles.checkboxLabel}>
           <input
             type="checkbox"
@@ -142,10 +190,14 @@ const SignUpScreen = () => {
           />
           Is Seller
         </label>
-        <button type="submit" style={styles.button}>
+        <button
+          type="submit"
+          style={styles.button}
+          disabled={errors.email || errors.phone}
+        >
           Sign Up
         </button>
-        {errorMessage && <p style={styles.error}>{errorMessage}</p>}
+        {errors.form && <p style={styles.error}>{errors.form}</p>}
       </form>
     </div>
   );
@@ -160,9 +212,10 @@ const styles = {
     background: "#28A745",
     color: "#fff",
     border: "none",
+    cursor: "pointer",
   },
   checkboxLabel: { fontSize: "14px", margin: "10px 0", textAlign: "left" },
-  error: { color: "red", marginTop: "10px" },
+  error: { color: "red", marginTop: "5px", fontSize: "14px" },
 };
 
 export default SignUpScreen;

@@ -24,7 +24,7 @@ public class User {
     private String password; // Hashed password
     private String firstName; // First name of the user
     private String lastName; // Last name of the user
-    private int phone;
+    private String phone;
     private boolean isSeller;
 
     private List<Address> billing = new ArrayList<>();
@@ -37,7 +37,7 @@ public class User {
     }
 
     // Constructor without billing and shipping addresses
-    public User(String username, String email, String password, String firstName, String lastName, int phone,
+    public User(String username, String email, String password, String firstName, String lastName, String phone,
             boolean isSeller) {
         this.username = username;
         this.email = email;
@@ -49,7 +49,7 @@ public class User {
     }
 
     // Constructor with billing and shipping addresses
-    public User(String username, String email, String password, String firstName, String lastName, int phone,
+    public User(String username, String email, String password, String firstName, String lastName, String phone,
             boolean isSeller,
             List<Address> billing, List<Address> shipping) {
         this.username = username;
@@ -113,11 +113,11 @@ public class User {
         this.lastName = lastName;
     }
 
-    public int getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(int phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 

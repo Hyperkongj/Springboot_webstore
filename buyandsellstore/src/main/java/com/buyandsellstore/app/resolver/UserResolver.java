@@ -46,17 +46,17 @@ public class UserResolver {
 
     @MutationMapping
     public AuthResponse signup(@Argument String username, @Argument String email, @Argument String password, @Argument String firstName,
-                               @Argument String lastName, @Argument int phone, @Argument boolean isSeller, @Argument List<Address> billing, @Argument List<Address> shipping) {
+                               @Argument String lastName, @Argument String phone, @Argument boolean isSeller, @Argument List<Address> billing, @Argument List<Address> shipping) {
 
         // Convert AddressInput to Address model
-        User createdUser = userService.createUser(new User(username, email, password, firstName, lastName, phone, isSeller));
-        createdUser.setBilling(billing);
-        createdUser.setBilling(shipping);
-        if (createdUser != null) {
-            return new AuthResponse(true, "Account created successfully!", createdUser);
-        } else {
-            return new AuthResponse(false, "User already exists.", null);
-        }
+        return userService.createUser(new User(username, email, password, firstName, lastName, phone, isSeller));
+//        createdUser.setBilling(billing);
+//        createdUser.setBilling(shipping);
+//        if (createdUser != null) {
+//            return new AuthResponse(true, "Account created successfully!", createdUser);
+//        } else {
+//            return new AuthResponse(false, "User already exists.", null);
+//        }
     }
 
 
