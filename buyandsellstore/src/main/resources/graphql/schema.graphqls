@@ -32,7 +32,7 @@ type User {
     firstName: String
     lastName: String
     isSeller: Boolean
-    phone: Int!
+    phone: String!
     billing: [AddressOutput]
     shipping: [AddressOutput]
 }
@@ -48,7 +48,7 @@ type Mutation {
         password: String!
         firstName: String!
         lastName: String!
-        phone: Int!
+        phone: String!
         isSeller: Boolean!
         billing: [Address]
         shipping: [Address]
