@@ -59,6 +59,7 @@ const SignUpScreen = () => {
     username: "",
     email: "",
     password: "",
+    verifyPassword: "",
     firstName: "",
     lastName: "",
     phone: "",
@@ -68,7 +69,13 @@ const SignUpScreen = () => {
   const [errors, setErrors] = useState({
     email: "",
     phone: "",
+    password: "",
+    verifyPassword: "",
+    form: "",
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showVerifyPassword, setShowVerifyPassword] = useState(false);
 
   const [signup] = useMutation(SIGNUP_MUTATION);
   const navigate = useNavigate();
@@ -85,12 +92,30 @@ const SignUpScreen = () => {
     }
 
     if (name === "phone") {
-      if (!/^\d{0,10}$/.test(value)) {
-        return; // Prevent input update if it's invalid
-      }
+      if (!/^\d{0,10}$/.test(value)) return;
       setErrors((prev) => ({
         ...prev,
         phone: value.length > 0 && value.length < 10 ? "Phone number must be 10 digits." : "",
+      }));
+    }
+
+    if (name === "password") {
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      setErrors((prev) => ({
+        ...prev,
+        password: value && !passwordRegex.test(value)
+          ? "Password must be at least 8 characters long, include an uppercase, lowercase, number, and special character."
+          : "",
+        verifyPassword: formData.verifyPassword && value !== formData.verifyPassword
+          ? "Passwords do not match."
+          : "",
+      }));
+    }
+
+    if (name === "verifyPassword") {
+      setErrors((prev) => ({
+        ...prev,
+        verifyPassword: value !== formData.password ? "Passwords do not match." : "",
       }));
     }
 
@@ -103,8 +128,8 @@ const SignUpScreen = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    if (errors.email || errors.phone) {
-      return; // Prevent submission if there are validation errors
+    if (errors.email || errors.phone || errors.password || errors.verifyPassword) {
+      return; 
     }
 
     try {
@@ -142,16 +167,47 @@ const SignUpScreen = () => {
           style={styles.input}
         />
         {errors.email && <p style={styles.error}>{errors.email}</p>}
-        
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
+
+        {/* Password Field with Eye Icon */}
+        <div style={styles.passwordContainer}>
+          <input
+            type={showPassword ? "text" : "password"}
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            style={styles.input}
+          />
+          <span
+            style={styles.eyeIcon}
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? "👁️" : "🔒"}
+          </span>
+        </div>
+        {errors.password && <p style={styles.error}>{errors.password}</p>}
+
+        {/* Verify Password Field with Eye Icon */}
+        <div style={styles.passwordContainer}>
+          <input
+            type={showVerifyPassword ? "text" : "password"}
+            name="verifyPassword"
+            placeholder="Verify Password"
+            value={formData.verifyPassword}
+            onChange={handleChange}
+            required
+            style={styles.input}
+          />
+          <span
+            style={styles.eyeIcon}
+            onClick={() => setShowVerifyPassword(!showVerifyPassword)}
+          >
+            {showVerifyPassword ? "👁️" : "🔒"}
+          </span>
+        </div>
+        {errors.verifyPassword && <p style={styles.error}>{errors.verifyPassword}</p>}
+
         <input
           type="text"
           name="firstName"
@@ -193,7 +249,7 @@ const SignUpScreen = () => {
         <button
           type="submit"
           style={styles.button}
-          disabled={errors.email || errors.phone}
+          disabled={errors.email || errors.phone || errors.password || errors.verifyPassword}
         >
           Sign Up
         </button>
@@ -206,14 +262,10 @@ const SignUpScreen = () => {
 const styles = {
   container: { maxWidth: "400px", margin: "50px auto", textAlign: "center" },
   form: { display: "flex", flexDirection: "column", gap: "10px" },
-  input: { padding: "10px", fontSize: "16px" },
-  button: {
-    padding: "10px",
-    background: "#28A745",
-    color: "#fff",
-    border: "none",
-    cursor: "pointer",
-  },
+  input: { padding: "10px", fontSize: "16px", width: "100%" },
+  passwordContainer: { position: "relative", width: "100%" },
+  eyeIcon: { position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", cursor: "pointer" },
+  button: { padding: "10px", background: "#28A745", color: "#fff", border: "none", cursor: "pointer" },
   checkboxLabel: { fontSize: "14px", margin: "10px 0", textAlign: "left" },
   error: { color: "red", marginTop: "5px", fontSize: "14px" },
 };
