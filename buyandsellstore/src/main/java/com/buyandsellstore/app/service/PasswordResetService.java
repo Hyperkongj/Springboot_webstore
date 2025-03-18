@@ -5,11 +5,12 @@ import com.buyandsellstore.app.model.User;
 import com.buyandsellstore.app.repository.PasswordResetTokenRepository;
 import com.buyandsellstore.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class PasswordResetService {
@@ -22,6 +23,10 @@ public class PasswordResetService {
 
     @Autowired
     private EmailService emailService;
+    
+    // Autowire the PasswordEncoder to hash the new password
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public String createPasswordResetToken(String email) {
         User user = userRepository.findByEmail(email);
@@ -43,10 +48,7 @@ public class PasswordResetService {
 
     public boolean validatePasswordResetToken(String token) {
         PasswordResetToken resetToken = tokenRepository.findByToken(token);
-        if (resetToken == null || resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            return false;
-        }
-        return true;
+        return resetToken != null && !resetToken.getExpiryDate().isBefore(LocalDateTime.now());
     }
 
     public boolean resetPassword(String token, String newPassword) {
@@ -63,8 +65,9 @@ public class PasswordResetService {
         }
         User user = optionalUser.get();
 
-        // Update the user's password directly (without hashing)
-        user.setPassword(newPassword);
+        // Hash the new password before updating the user record
+        String hashedPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(hashedPassword);
 
         // Save the updated user
         userRepository.save(user);
@@ -74,5 +77,4 @@ public class PasswordResetService {
 
         return true;
     }
-
 }
