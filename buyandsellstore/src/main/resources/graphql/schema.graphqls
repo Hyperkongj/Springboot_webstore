@@ -16,6 +16,29 @@ input Address {
     country: String
 }
 
+type Order {
+    id: ID!
+    userId: ID!
+    items: [CartItem!]!
+    totalPrice: Float!
+    createdAt: String!
+}
+
+input PaymentInput {
+    cardNumber: String!
+    expiry: String!
+    cvv: String!
+}
+
+input CartItemInput {
+    itemId: ID!
+    type: String # E.g., "book", "home", etc.
+    name: String
+    quantity: Int!
+    price: Float!
+    imageUrl: String!
+}
+
 type Query {
     # A simple query to return a greeting message
     hello: String
@@ -23,6 +46,7 @@ type Query {
     # Fetch a single book by its ID
     book(id: ID!): Book
     books: [Book!]!
+    getOrdersByUserId(userId: ID!): [Order]
 }
 
 type User {
@@ -57,6 +81,14 @@ type Mutation {
     addToCart(userId: ID!, itemId: ID!, type: String!): ResponseMessage!
     # Mutation to remove an item from the cart
     removeFromCart(userId: ID!, itemId: ID, type: String): ResponseMessage!
+    createOrder(
+        userId: ID!
+        items: [CartItemInput!]!
+        totalPrice: Float!
+        billing: Address
+        shipping: Address
+        payment: PaymentInput!
+    ): OrderResponse!
 }
 
 # Response object for authentication-related mutations
@@ -110,4 +142,10 @@ type Review {
 type ResponseMessage {
     success: Boolean!
     message: String!
+}
+
+type OrderResponse {
+    success: Boolean!
+    message: String!
+    order: Order
 }

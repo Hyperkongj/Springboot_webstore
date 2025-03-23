@@ -30,6 +30,7 @@ import CartScreen from "./screens/CartScreen";
 // Import the books list and detail components
 import Books from "./screens/BooksScreen"; // List of books
 import Book from "./screens/BookDetailScreen";   // Book detail view
+import CheckoutScreen from "./screens/CheckoutScreen";
 
 // Clean __typename from variables
 const cleanTypenameLink = new ApolloLink((operation, forward) => {
@@ -102,6 +103,14 @@ const AppRoutes = () => {
             element={
               <ProtectedRoute>
                 <CartScreen />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/checkoutScreen"
+            element={
+              <ProtectedRoute>
+                <CheckoutScreen />
               </ProtectedRoute>
             }
           />
