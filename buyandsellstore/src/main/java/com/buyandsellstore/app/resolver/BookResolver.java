@@ -1,7 +1,6 @@
 package com.buyandsellstore.app.resolver;
 
 import com.buyandsellstore.app.model.Book;
-import com.buyandsellstore.app.repository.BookRepository;
 import com.buyandsellstore.app.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
