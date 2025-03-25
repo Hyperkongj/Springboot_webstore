@@ -49,4 +49,8 @@ public class OrderService {
             return orderList;
         }
     }
+
+    public long removeOrderByUserId(String userId) {
+        return orderRepository.removeByUserId(userId);
+    }
 }
