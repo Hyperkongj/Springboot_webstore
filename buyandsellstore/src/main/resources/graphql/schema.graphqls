@@ -39,14 +39,88 @@ input CartItemInput {
     imageUrl: String!
 }
 
+<<<<<<< Updated upstream
+=======
+type CartItem {
+    itemId: ID!
+    type: String # E.g., "book", "home", etc.
+    name: String
+    quantity: Int
+    price: Float
+    imageUrl: String
+}
+
+type Review {
+    reviewer: String!
+    comment: String!
+    rating: Float!
+}
+
+input ReviewInput {
+    reviewer: String!
+    comment: String!
+    rating: Float!
+}
+
+type ResponseMessage {
+    success: Boolean!
+    message: String!
+}
+
+type OrderResponse {
+    success: Boolean!
+    message: String!
+    order: Order
+}
+
+# ---------------------------
+# New Wishlist Functionality
+# ---------------------------
+type WishlistItem {
+    id: ID!
+    userId: ID!
+    itemId: ID!
+    type: String!
+    name: String!
+    imageUrl: String!
+}
+
+input WishlistItemInput {
+    userId: ID!
+    itemId: ID!
+    type: String!
+    name: String!
+    imageUrl: String!
+}
+
+# Optionally add a new query to get the count of wishlist items
+extend type Query {
+    wishlistCount(userId: ID!): Int!
+}
+
+# Optionally add subscriptions for real-time wishlist updates
+type Subscription {
+    wishlistItemAdded(userId: ID!): WishlistItem!
+    wishlistItemUpdated(userId: ID!): WishlistItem!
+    wishlistItemRemoved(userId: ID!): ResponseMessage!
+}
+
+# ---------------------------
+# Existing Query and Mutation Types with Wishlist Additions
+# ---------------------------
+>>>>>>> Stashed changes
 type Query {
-    # A simple query to return a greeting message
     hello: String
     cartItems(id: ID!): [CartItem]
-    # Fetch a single book by its ID
     book(id: ID!): Book
     books: [Book!]!
     getOrdersByUserId(userId: ID!): [Order]
+<<<<<<< Updated upstream
+=======
+
+    wishlistItems(userId: ID!): [WishlistItem!]!
+    wishlistItem(id: ID!): WishlistItem
+>>>>>>> Stashed changes
 }
 
 type User {
@@ -62,10 +136,8 @@ type User {
 }
 
 type Mutation {
-    # Mutation to handle user login
     login(username: String!, password: String!): AuthResponse
 
-    # Mutation to handle user signup
     signup(
         username: String!
         email: String!
@@ -79,8 +151,8 @@ type Mutation {
     ): AuthResponse
 
     addToCart(userId: ID!, itemId: ID!, type: String!): ResponseMessage!
-    # Mutation to remove an item from the cart
     removeFromCart(userId: ID!, itemId: ID, type: String): ResponseMessage!
+
     createOrder(
         userId: ID!
         items: [CartItemInput!]!
@@ -89,38 +161,52 @@ type Mutation {
         shipping: Address
         payment: PaymentInput!
     ): OrderResponse!
+<<<<<<< Updated upstream
+=======
+
+    addReview(bookId: ID!, review: ReviewInput!): Book!
+    updateReview(bookId: ID!, reviewer: String!, updatedReview: ReviewInput!): Book!
+    deleteReview(bookId: ID!, reviewer: String!): Book!
+
+    addWishlistItem(input: WishlistItemInput!): WishlistItem!
+    updateWishlistItem(input: WishlistItemInput!): WishlistItem!
+    removeWishlistItem(id: ID!): ResponseMessage!
+>>>>>>> Stashed changes
 }
 
-# Response object for authentication-related mutations
 type AuthResponse {
     success: Boolean!
     message: String!
     user: User
 }
 
-# For Forgot Password
 extend type Mutation {
+<<<<<<< Updated upstream
   forgotPassword(email: String!): String
 }
 # For Reset Password
 extend type Mutation {
   resetPassword(token: String!, newPassword: String!): ResetPasswordResponse!
+=======
+    forgotPassword(email: String!): String
+    resetPassword(token: String!, newPassword: String!): ResetPasswordResponse!
+>>>>>>> Stashed changes
 }
 
 type ResetPasswordResponse {
-  success: Boolean!
-  message: String
+    success: Boolean!
+    message: String
 }
 
-# Book type definition
 type Book {
-    id: ID! # Unique identifier for the book
+    id: ID!
     title: String!
     author: String!
     price: Float!
     imageUrl: String!
     description: String
     ratings: Float!
+<<<<<<< Updated upstream
     reviews: [Review!] # Now Review is defined
 }
 
@@ -148,4 +234,7 @@ type OrderResponse {
     success: Boolean!
     message: String!
     order: Order
+=======
+    reviews: [Review!]
+>>>>>>> Stashed changes
 }

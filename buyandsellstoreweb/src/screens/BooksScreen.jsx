@@ -23,13 +23,17 @@ const Books = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (data && data.books) {
+    if (data && data.books && !loading) {
       setBooks(data.books);
     }
   }, [data]);
 
   if (loading) return <p>Loading books...</p>;
   if (error) return <p>Error loading books: {error.message}</p>;
+
+  if(data.books.length == 0){
+    return <p>No Books to show.</p>
+  }
 
   return (
     <div style={styles.container}>
