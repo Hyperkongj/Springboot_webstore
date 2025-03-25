@@ -1,3 +1,24 @@
+/*to run tests , go to cd /Users/mohitsharma/Desktop/softproj/CS5394.Group3/buyandsellstore
+ then mvn test
+ * Test Cases for WishlistItemService:
+ *
+ * 1. Add Wishlist Item Test:
+ *    - Purpose: Verify that the service correctly saves a wishlist item by calling the repository's save method.
+ *    - Relevance: Ensures that the "create" operation in CRUD is working as expected.
+ *
+ * 2. Get Wishlist Item by ID Test:
+ *    - Purpose: Check that a wishlist item can be retrieved by its unique ID.
+ *    - Relevance: Validates the "read" operation for individual items.
+ *
+ * 3. Get Wishlist Items by User ID Test:
+ *    - Purpose: Ensure that all wishlist items associated with a specific user are returned.
+ *    - Relevance: Confirms that the service properly filters items by user, which is crucial for delivering personalized data.
+ *
+ * 4. Remove Wishlist Item Test:
+ *    - Purpose: Confirm that the service correctly deletes a wishlist item by its ID using the repository's deleteById method.
+ *    - Relevance: Verifies the "delete" functionality, ensuring unwanted items can be removed.
+ */
+
 package com.buyandsellstore.app.service;
 
 import static org.junit.jupiter.api.Assertions.*;
