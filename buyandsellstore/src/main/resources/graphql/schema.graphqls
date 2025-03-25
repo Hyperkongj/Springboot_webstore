@@ -39,6 +39,67 @@ input CartItemInput {
     imageUrl: String!
 }
 
+type CartItem {
+    itemId: ID!
+    type: String # E.g., "book", "home", etc.
+    name: String
+    quantity: Int
+    price: Float
+    imageUrl: String
+}
+
+type Review {
+    reviewer: String!
+    comment: String!
+    rating: Float!
+}
+
+type ResponseMessage {
+    success: Boolean!
+    message: String!
+}
+
+type OrderResponse {
+    success: Boolean!
+    message: String!
+    order: Order
+}
+
+# ---------------------------
+# New Wishlist Functionality
+# ---------------------------
+type WishlistItem {
+    id: ID!
+    userId: ID!
+    itemId: ID!
+    type: String!
+    name: String!
+    imageUrl: String!
+}
+
+input WishlistItemInput {
+    userId: ID!
+    itemId: ID!
+    type: String!
+    name: String!
+    imageUrl: String!
+}
+
+# Optionally add a new query to get the count of wishlist items
+extend type Query {
+    wishlistCount(userId: ID!): Int!
+}
+
+# Optionally add subscriptions for real-time wishlist updates
+type Subscription {
+    wishlistItemAdded(userId: ID!): WishlistItem!
+    wishlistItemUpdated(userId: ID!): WishlistItem!
+    wishlistItemRemoved(userId: ID!): ResponseMessage!
+}
+
+# ---------------------------
+# Existing Query and Mutation Types with Wishlist Additions
+# ---------------------------
 type Query {
     # A simple query to return a greeting message
     hello: String
@@ -47,6 +108,10 @@ type Query {
     book(id: ID!): Book
     books: [Book!]!
     getOrdersByUserId(userId: ID!): [Order]
+    
+    # Wishlist queries
+    wishlistItems(userId: ID!): [WishlistItem!]!
+    wishlistItem(id: ID!): WishlistItem
 }
 
 type User {
@@ -89,6 +154,11 @@ type Mutation {
         shipping: Address
         payment: PaymentInput!
     ): OrderResponse!
+    
+    # Wishlist mutations
+    addWishlistItem(input: WishlistItemInput!): WishlistItem!
+    updateWishlistItem(input: WishlistItemInput!): WishlistItem!
+    removeWishlistItem(id: ID!): ResponseMessage!
 }
 
 # Response object for authentication-related mutations
@@ -102,6 +172,7 @@ type AuthResponse {
 extend type Mutation {
   forgotPassword(email: String!): String
 }
+
 # For Reset Password
 extend type Mutation {
   resetPassword(token: String!, newPassword: String!): ResetPasswordResponse!
@@ -122,30 +193,4 @@ type Book {
     description: String
     ratings: Float!
     reviews: [Review!] # Now Review is defined
-}
-
-type CartItem {
-    itemId: ID!
-    type: String # E.g., "book", "home", etc.
-    name: String
-    quantity: Int
-    price: Float
-    imageUrl: String
-}
-
-type Review {
-    reviewer: String!
-    comment: String!
-    rating: Float!
-}
-
-type ResponseMessage {
-    success: Boolean!
-    message: String!
-}
-
-type OrderResponse {
-    success: Boolean!
-    message: String!
-    order: Order
 }
