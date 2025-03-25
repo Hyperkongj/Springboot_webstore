@@ -115,7 +115,6 @@ const WishlistScreen = () => {
     <div>
       {/* If you already render <Header /> in a parent component, remove or comment this out to avoid double headers */}
       
-
       <h1>Your Wishlist</h1>
       {removeMessage && <p style={{ color: "red" }}>{removeMessage}</p>}
       {cartMessage && <p style={{ color: "green" }}>{cartMessage}</p>}
