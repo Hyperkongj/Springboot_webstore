@@ -17,6 +17,10 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    public User existByUserName(String username){
+        return userRepository.findByUsername(username);
+    }
+
     /**
      * Authenticates a user by comparing the raw password with the stored hashed password.
      *
@@ -57,4 +61,6 @@ public class UserService {
         User savedUser = userRepository.save(user);
         return new AuthResponse(true, "User successfully added to DB!", savedUser);
     }
+
+
 }
