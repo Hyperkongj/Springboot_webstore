@@ -1,3 +1,4 @@
+// src/screens/BookDetailScreen.jsx
 import React, { useState, useEffect } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { useParams } from "react-router-dom";
@@ -5,6 +6,7 @@ import { useUserContext } from "../context/UserContext";
 
 const API_BASE_URL = "http://localhost:8080";
 
+// Existing query to fetch book details
 const GET_BOOK_DETAILS = gql`
   query GetBookDetails($id: ID!) {
     book(id: $id) {
@@ -23,6 +25,7 @@ const GET_BOOK_DETAILS = gql`
   }
 `;
 
+// Existing mutation for adding to cart
 const ADD_TO_CART = gql`
   mutation AddToCart($userId: ID!, $itemId: ID!, $type: String!) {
     addToCart(userId: $userId, itemId: $itemId, type: $type) {
@@ -32,6 +35,7 @@ const ADD_TO_CART = gql`
   }
 `;
 
+// Existing mutation for removing from cart
 const REMOVE_FROM_CART = gql`
   mutation RemoveFromCart($userId: ID!, $itemId: ID!, $type: String!) {
     removeFromCart(userId: $userId, itemId: $itemId, type: $type) {
@@ -41,6 +45,7 @@ const REMOVE_FROM_CART = gql`
   }
 `;
 
+// Existing query for viewing cart items
 const VIEW_CART = gql`
   query GetCartItems($userId: ID!) {
     cartItems(id: $userId) {
@@ -54,8 +59,6 @@ const VIEW_CART = gql`
   }
 `;
 
-<<<<<<< Updated upstream
-=======
 // New mutation for adding a wishlist item
 const ADD_WISHLIST_ITEM = gql`
   mutation AddWishlistItem($input: WishlistItemInput!) {
@@ -123,7 +126,6 @@ const DELETE_REVIEW = gql`
   }
 `;
 
->>>>>>> Stashed changes
 const Book = () => {
   const { id } = useParams();
   const { user } = useUserContext();
@@ -132,6 +134,9 @@ const Book = () => {
     variables: { id },
   });
 
+  const book = data?.book;
+
+
   const { data: cartData, refetch: refetchCart } = useQuery(VIEW_CART, {
     variables: { userId: user?.id || "placeholder-id" }, // ✅ always runs
   });
@@ -139,8 +144,6 @@ const Book = () => {
   //Mutations
   const [addToCart, { loading: addLoading }] = useMutation(ADD_TO_CART);
   const [removeFromCart, { loading: removeLoading }] = useMutation(REMOVE_FROM_CART);
-<<<<<<< Updated upstream
-=======
   const [addReview] = useMutation(ADD_REVIEW);
   const [updateReview] = useMutation(UPDATE_REVIEW);
   const [deleteReview] = useMutation(DELETE_REVIEW);
@@ -184,16 +187,13 @@ const Book = () => {
   );
 
   //Hooks
->>>>>>> Stashed changes
   const [cartMessage, setCartMessage] = useState("");
+  const [wishlistMessage, setWishlistMessage] = useState("");
   const [cartQuantity, setCartQuantity] = useState(0);
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState("");
   const [reviewMessage, setReviewMessage] = useState("");
-  //const existingReview = book.reviews.find((r) => r.reviewer === user?.username);
-
-
-
+  const existingReview = book?.reviews.find((r) => r.reviewer === user?.username);
 
   useEffect(() => {
     if (cartData) {
@@ -211,7 +211,9 @@ const Book = () => {
       const response = await addToCart({
         variables: { userId: user.id, itemId: id, type: "book" },
       });
-      setCartMessage(response.data.addToCart.message || "Book added to cart successfully!");
+      setCartMessage(
+        response.data.addToCart.message || "Book added to cart successfully!"
+      );
       refetchCart();
     } catch (err) {
       console.error(err);
@@ -228,7 +230,9 @@ const Book = () => {
       const response = await removeFromCart({
         variables: { userId: user.id, itemId: id, type: "book" },
       });
-      setCartMessage(response.data.removeFromCart.message || "Book removed from cart!");
+      setCartMessage(
+        response.data.removeFromCart.message || "Book removed from cart!"
+      );
       refetchCart();
     } catch (err) {
       console.error(err);
@@ -236,10 +240,9 @@ const Book = () => {
     }
   };
 
-<<<<<<< Updated upstream
-  if (loading) return <p>Loading book details...</p>;
-  if (error) return <p>Error loading book details: {error.message}</p>;
-=======
+  //if (loading) return <p>Loading book details...</p>;
+  //if (error) return <p>Error loading book details: {error.message}</p>;
+
   // Handler for adding a book to the wishlist
   const handleAddToWishlist = async () => {
     if (!user || !user.id) {
@@ -296,12 +299,15 @@ const Book = () => {
     }
   };
   
->>>>>>> Stashed changes
+
 
   //if (loading) return <p>Loading book details...</p>;
   //if (error) return <p>Error loading book details: {error.message}</p>;
 
-<<<<<<< Updated upstream
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+  if (!book) return <p>Book not found.</p>;
+
   return (
     <div style={styles.container}>
       <div style={styles.bookDetails}>
@@ -312,9 +318,15 @@ const Book = () => {
         />
         <div style={styles.bookInfo}>
           <h1>{book.title}</h1>
-          <p><strong>Author:</strong> {book.author}</p>
-          <p><strong>Price:</strong> ${book.price.toFixed(2)}</p>
-          <p><strong>Ratings:</strong> {book.ratings.toFixed(1)} / 5</p>
+          <p>
+            <strong>Author:</strong> {book.author}
+          </p>
+          <p>
+            <strong>Price:</strong> ${book.price.toFixed(2)}
+          </p>
+          <p>
+            <strong>Ratings:</strong> {book.ratings.toFixed(1)} / 5
+          </p>
           <div style={styles.cartButtons}>
             <button
               onClick={handleRemoveFromCart}
@@ -333,149 +345,89 @@ const Book = () => {
             </button>
           </div>
           {cartMessage && <p style={styles.cartMessage}>{cartMessage}</p>}
+          <div style={styles.wishlistSection}>
+            <button
+              onClick={handleAddToWishlist}
+              style={styles.wishlistButton}
+              disabled={wishlistLoading}
+            >
+              {wishlistLoading ? "Adding..." : "Add to Wishlist"}
+            </button>
+            {wishlistMessage && (
+              <p style={styles.wishlistMessage}>{wishlistMessage}</p>
+            )}
+          </div>
         </div>
       </div>
       <div style={styles.reviews}>
         <h2>Reviews</h2>
-        {book.reviews.map((review, index) => (
-          <div key={index} style={styles.review}>
-            <p><strong>{review.reviewer}:</strong> {review.comment}</p>
-            <p><strong>Rating:</strong> {review.rating} / 5</p>
+        {book.reviews.map((review, i) => (
+          <div key={i} style={styles.review}>
+            <p>
+              <strong>{review.reviewer}:</strong> {review.comment}
+            </p>
+            <p>
+              <strong>Rating:</strong> {review.rating} / 5
+            </p>
           </div>
         ))}
       </div>
+      {user && (
+        <form onSubmit={handleSubmitReview} style={{ marginTop: 20 }}>
+          <h3>{existingReview ? "Update" : "Add"} Your Review</h3>
+          <textarea
+            placeholder="Write a review"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            required
+          />
+          <br />
+          <input
+            type="number"
+            min="0"
+            max="5"
+            step="0.1"
+            value={rating}
+            onChange={(e) => setRating(e.target.value)}
+            placeholder="Rating (0-5)"
+            required
+          />
+          <br />
+          <button type="submit">
+            {existingReview ? "Update" : "Add"} Review
+          </button>
+          {existingReview && (
+            <button type="button" onClick={handleDeleteReview}>
+              Delete Review
+            </button>
+          )}
+          {reviewMessage && <p>{reviewMessage}</p>}
+        </form>
+      )}
     </div>
   );
-=======
-  const book = data?.book;
-  const existingReview = book?.reviews?.find((r) => r.reviewer === user?.username);
-
-  // Now hooks
-  useEffect(() => {
-    if (existingReview) {
-      setComment(existingReview.comment);
-      setRating(existingReview.rating);
-    } else {
-      setComment("");
-      setRating("");
-    }
-  }, [existingReview]);
-  
-  //const book = data?.book;
-
-return (
-  <div style={styles.container}>
-    {loading ? (
-      <p>Loading book details...</p>
-    ) : error ? (
-      <p>Error loading book details: {error.message}</p>
-    ) : book ? (
-      <>
-        <div style={styles.bookDetails}>
-          <img
-            src={`${API_BASE_URL}${book.imageUrl}`}
-            alt={book.title}
-            style={styles.bookImage}
-          />
-          <div style={styles.bookInfo}>
-            <h1>{book.title}</h1>
-            <p><strong>Author:</strong> {book.author}</p>
-            <p><strong>Price:</strong> ${book.price.toFixed(2)}</p>
-            <p><strong>Ratings:</strong> {book.ratings.toFixed(1)} / 5</p>
-
-            <div style={styles.cartButtons}>
-              <button
-                onClick={handleRemoveFromCart}
-                style={styles.cartButton}
-                disabled={removeLoading}
-              >
-                {removeLoading ? "Removing..." : "-"}
-              </button>
-              <span style={styles.cartQuantity}>{cartQuantity}</span>
-              <button
-                onClick={handleAddToCart}
-                style={styles.cartButton}
-                disabled={addLoading}
-              >
-                {addLoading ? "Adding..." : "+"}
-              </button>
-            </div>
-
-            {cartMessage && <p style={styles.cartMessage}>{cartMessage}</p>}
-
-            <div style={styles.wishlistSection}>
-              <button
-                onClick={handleAddToWishlist}
-                style={styles.wishlistButton}
-                disabled={wishlistLoading}
-              >
-                {wishlistLoading ? "Adding..." : "Add to Wishlist"}
-              </button>
-              {wishlistMessage && (
-                <p style={styles.wishlistMessage}>{wishlistMessage}</p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div style={styles.reviews}>
-          <h2>Reviews</h2>
-          {book.reviews.map((review, index) => (
-            <div key={index} style={styles.review}>
-              <p><strong>{review.reviewer}:</strong> {review.comment}</p>
-              <p><strong>Rating:</strong> {review.rating} / 5</p>
-            </div>
-          ))}
-        </div>
-
-        {user && (
-          <form onSubmit={handleSubmitReview} style={{ marginTop: 20 }}>
-            <h3>{existingReview ? "Update" : "Add"} Your Review</h3>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Write a review"
-              required
-            />
-            <br />
-            <input
-              type="number"
-              min="0"
-              max="5"
-              step="0.1"
-              value={rating}
-              onChange={(e) => setRating(e.target.value)}
-              placeholder="Rating (0-5)"
-              required
-            />
-            <br />
-            <button type="submit">
-              {existingReview ? "Update Review" : "Add Review"}
-            </button>
-            {existingReview && (
-              <button type="button" onClick={handleDeleteReview}>
-                Delete Review
-              </button>
-            )}
-            {reviewMessage && <p>{reviewMessage}</p>}
-          </form>
-        )}
-      </>
-    ) : (
-      <p>Book not found.</p>
-    )}
-  </div>
-);
-
->>>>>>> Stashed changes
 };
 
 const styles = {
   container: { padding: "20px", fontFamily: "Arial, sans-serif" },
-  bookDetails: { display: "flex", gap: "20px", flexWrap: "wrap", marginBottom: "20px" },
-  bookImage: { width: "200px", height: "300px", objectFit: "contain" },
+  bookDetails: {
+    display: "flex",
+    gap: "20px",
+    flexWrap: "wrap",
+    marginBottom: "20px",
+  },
+  bookImage: {
+    width: "200px",
+    height: "300px",
+    objectFit: "contain",
+  },
   bookInfo: { maxWidth: "600px" },
-  cartButtons: { display: "flex", alignItems: "center", gap: "10px", marginTop: "10px" },
+  cartButtons: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    marginTop: "10px",
+  },
   cartQuantity: { fontSize: "18px", fontWeight: "bold" },
   cartButton: {
     padding: "10px 20px",
@@ -486,8 +438,27 @@ const styles = {
     cursor: "pointer",
   },
   cartMessage: { marginTop: "10px", color: "green" },
+  wishlistSection: { marginTop: "20px" },
+  wishlistButton: {
+    padding: "10px 20px",
+    background: "#28a745",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+  },
+  wishlistMessage: { marginTop: "10px", color: "green" },
   reviews: { marginTop: "20px" },
-  review: { marginBottom: "15px", padding: "10px", border: "1px solid #ddd", borderRadius: "5px" },
+  review: {
+    marginBottom: "15px",
+    padding: "10px",
+    border: "1px solid #ddd",
+    borderRadius: "5px",
+  },
 };
 
 export default Book;
+export {
+  GET_BOOK_DETAILS,
+  ADD_REVIEW,
+};

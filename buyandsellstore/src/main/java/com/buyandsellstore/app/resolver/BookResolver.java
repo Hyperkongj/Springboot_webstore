@@ -1,11 +1,7 @@
 package com.buyandsellstore.app.resolver;
-
 import com.buyandsellstore.app.model.Book;
-<<<<<<< Updated upstream
 import com.buyandsellstore.app.repository.BookRepository;
-=======
 import com.buyandsellstore.app.model.Review;
->>>>>>> Stashed changes
 import com.buyandsellstore.app.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;

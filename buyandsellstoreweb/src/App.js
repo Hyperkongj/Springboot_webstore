@@ -29,8 +29,11 @@ import Header from "./components/Header";
 import CartScreen from "./screens/CartScreen";
 // Import the books list and detail components
 import Books from "./screens/BooksScreen"; // List of books
-import Book from "./screens/BookDetailScreen";   // Book detail view
+import Book from "./screens/BookDetailScreen"; // Book detail view
 import CheckoutScreen from "./screens/CheckoutScreen";
+
+// NEW: Import your new Wishlist screen
+import WishlistScreen from "./screens/WishlistScreen"; // <-- ADD THIS
 
 // Clean __typename from variables
 const cleanTypenameLink = new ApolloLink((operation, forward) => {
@@ -93,27 +96,37 @@ const AppRoutes = () => {
           element={user ? <Book /> : <Navigate to="/login" replace />}
         />
 
+        {/* NEW: Wishlist (Protected) */}
+        <Route
+          path="/wishlist"
+          element={
+            <ProtectedRoute>
+              <WishlistScreen />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Catch-all: redirect based on login */}
         <Route
           path="*"
           element={<Navigate to={user ? "/home" : "/login"} replace />}
         />
         <Route
-            path="/cart"
-            element={
-              <ProtectedRoute>
-                <CartScreen />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/checkoutScreen"
-            element={
-              <ProtectedRoute>
-                <CheckoutScreen />
-              </ProtectedRoute>
-            }
-          />
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <CartScreen />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/checkoutScreen"
+          element={
+            <ProtectedRoute>
+              <CheckoutScreen />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );

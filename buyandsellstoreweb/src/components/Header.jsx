@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useUserContext } from "../context/UserContext";
 
 const Header = () => {
   const { user, logout } = useUserContext();
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
+
   const handleLogout = () => {
     logout(); // Clear user context
     navigate("/login");
@@ -13,16 +14,22 @@ const Header = () => {
 
   return (
     <header style={styles.header}>
-      <h2 style={{ ...styles.title, ...(isHovered ? styles.iconHover : {})}} 
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={() => navigate("/home")}>Buy&Sell Home</h2>
+      <h2
+        style={{ ...styles.title, ...(isHovered ? styles.iconHover : {}) }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={() => navigate("/home")}
+      >
+        Buy&Sell Home
+      </h2>
       <div style={styles.nav}>
         {user && (
           <>
             <span style={styles.welcome}>Welcome, {user.firstName}</span>
             <Link to="/profile" style={styles.icon}>👤</Link>
             <Link to="/cart" style={styles.icon}>🛒</Link>
+            {/* NEW: Wishlist Link */}
+            <Link to="/wishlist" style={styles.icon}>❤️</Link>
             <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
           </>
         )}
