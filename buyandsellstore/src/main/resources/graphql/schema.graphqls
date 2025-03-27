@@ -32,16 +32,131 @@ input PaymentInput {
 
 input CartItemInput {
     itemId: ID!
-    type: String # E.g., "book", "home", etc.
+    type: String
     name: String
     quantity: Int!
     price: Float!
     imageUrl: String!
 }
 
+input ReviewInput {
+    reviewer: String!
+    comment: String!
+    rating: Float!
+}
+
+# Wishlist Functionality
+type WishlistItem {
+    id: ID!
+    userId: ID!
+    itemId: ID!
+    type: String!
+    name: String!
+    imageUrl: String!
+}
+
+input WishlistItemInput {
+    userId: ID!
+    itemId: ID!
+    type: String!
+    name: String!
+    imageUrl: String!
+}
+
+# Subscription support (optional)
+type Subscription {
+    wishlistItemAdded(userId: ID!): WishlistItem!
+    wishlistItemUpdated(userId: ID!): WishlistItem!
+    wishlistItemRemoved(userId: ID!): ResponseMessage!
+}
+
+type Query {
+    hello: String
+    cartItems(id: ID!): [CartItem]
+    book(id: ID!): Book
+    books: [Book!]!
+    getOrdersByUserId(userId: ID!): [Order]
+    wishlistItems(userId: ID!): [WishlistItem!]!
+    wishlistItem(id: ID!): WishlistItem
+    wishlistCount(userId: ID!): Int!
+}
+
+type Mutation {
+    login(username: String!, password: String!): AuthResponse
+
+    signup(
+        username: String!
+        email: String!
+        password: String!
+        firstName: String!
+        lastName: String!
+        phone: String!
+        isSeller: Boolean!
+        billing: [Address]
+        shipping: [Address]
+    ): AuthResponse
+
+    addToCart(userId: ID!, itemId: ID!, type: String!): ResponseMessage!
+    removeFromCart(userId: ID!, itemId: ID, type: String): ResponseMessage!
+
+    createOrder(
+        userId: ID!
+        items: [CartItemInput!]!
+        totalPrice: Float!
+        billing: Address
+        shipping: Address
+        payment: PaymentInput!
+    ): OrderResponse!
+
+    addReview(bookId: ID!, review: ReviewInput!): Book!
+    updateReview(bookId: ID!, reviewer: String!, updatedReview: ReviewInput!): Book!
+    deleteReview(bookId: ID!, reviewer: String!): Book!
+
+    addWishlistItem(input: WishlistItemInput!): WishlistItem!
+    updateWishlistItem(input: WishlistItemInput!): WishlistItem!
+    removeWishlistItem(id: ID!): ResponseMessage!
+
+    forgotPassword(email: String!): String
+    resetPassword(token: String!, newPassword: String!): ResetPasswordResponse!
+}
+
+type AuthResponse {
+    success: Boolean!
+    message: String!
+    user: User
+}
+
+type ResetPasswordResponse {
+    success: Boolean!
+    message: String
+}
+
+type User {
+    id: ID!
+    username: String!
+    email: String!
+    firstName: String
+    lastName: String
+    isSeller: Boolean
+    phone: String!
+    billing: [AddressOutput]
+    shipping: [AddressOutput]
+}
+
+type Book {
+    id: ID!
+    title: String!
+    author: String!
+    price: Float!
+    imageUrl: String!
+    description: String
+    ratings: Float!
+    reviews: [Review!]
+}
+
 type CartItem {
     itemId: ID!
-    type: String # E.g., "book", "home", etc.
+    type: String
     name: String
     quantity: Int
     price: Float
@@ -63,134 +178,5 @@ type OrderResponse {
     success: Boolean!
     message: String!
     order: Order
-}
-
-# ---------------------------
-# New Wishlist Functionality
-# ---------------------------
-type WishlistItem {
-    id: ID!
-    userId: ID!
-    itemId: ID!
-    type: String!
-    name: String!
-    imageUrl: String!
-}
-
-input WishlistItemInput {
-    userId: ID!
-    itemId: ID!
-    type: String!
-    name: String!
-    imageUrl: String!
-}
-
-# Optionally add a new query to get the count of wishlist items
-extend type Query {
-    wishlistCount(userId: ID!): Int!
-}
-
-# Optionally add subscriptions for real-time wishlist updates
-type Subscription {
-    wishlistItemAdded(userId: ID!): WishlistItem!
-    wishlistItemUpdated(userId: ID!): WishlistItem!
-    wishlistItemRemoved(userId: ID!): ResponseMessage!
-}
-
-# ---------------------------
-# Existing Query and Mutation Types with Wishlist Additions
-# ---------------------------
-type Query {
-    # A simple query to return a greeting message
-    hello: String
-    cartItems(id: ID!): [CartItem]
-    # Fetch a single book by its ID
-    book(id: ID!): Book
-    books: [Book!]!
-    getOrdersByUserId(userId: ID!): [Order]
-    
-    # Wishlist queries
-    wishlistItems(userId: ID!): [WishlistItem!]!
-    wishlistItem(id: ID!): WishlistItem
-}
-
-type User {
-    id: ID!
-    username: String!
-    email: String!
-    firstName: String
-    lastName: String
-    isSeller: Boolean
-    phone: String!
-    billing: [AddressOutput]
-    shipping: [AddressOutput]
-}
-
-type Mutation {
-    # Mutation to handle user login
-    login(username: String!, password: String!): AuthResponse
-
-    # Mutation to handle user signup
-    signup(
-        username: String!
-        email: String!
-        password: String!
-        firstName: String!
-        lastName: String!
-        phone: String!
-        isSeller: Boolean!
-        billing: [Address]
-        shipping: [Address]
-    ): AuthResponse
-
-    addToCart(userId: ID!, itemId: ID!, type: String!): ResponseMessage!
-    # Mutation to remove an item from the cart
-    removeFromCart(userId: ID!, itemId: ID, type: String): ResponseMessage!
-    createOrder(
-        userId: ID!
-        items: [CartItemInput!]!
-        totalPrice: Float!
-        billing: Address
-        shipping: Address
-        payment: PaymentInput!
-    ): OrderResponse!
-    
-    # Wishlist mutations
-    addWishlistItem(input: WishlistItemInput!): WishlistItem!
-    updateWishlistItem(input: WishlistItemInput!): WishlistItem!
-    removeWishlistItem(id: ID!): ResponseMessage!
-}
-
-# Response object for authentication-related mutations
-type AuthResponse {
-    success: Boolean!
-    message: String!
-    user: User
-}
-
-# For Forgot Password
-extend type Mutation {
-  forgotPassword(email: String!): String
-}
-
-# For Reset Password
-extend type Mutation {
-  resetPassword(token: String!, newPassword: String!): ResetPasswordResponse!
-}
-
-type ResetPasswordResponse {
-  success: Boolean!
-  message: String
-}
-
-# Book type definition
-type Book {
-    id: ID! # Unique identifier for the book
-    title: String!
-    author: String!
-    price: Float!
-    imageUrl: String!
-    description: String
-    ratings: Float!
-    reviews: [Review!] # Now Review is defined
+    reviews: [Review!]
 }
