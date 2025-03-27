@@ -193,8 +193,7 @@ const Book = () => {
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState("");
   const [reviewMessage, setReviewMessage] = useState("");
-  const existingReview = book?.reviews.find((r) => r.reviewer === user?.username);
-
+const existingReview = book?.reviews.find((r) => r.reviewer === user?.username);
   useEffect(() => {
     if (cartData) {
       const bookInCart = cartData.cartItems.find((item) => item.itemId === id);
@@ -373,36 +372,48 @@ const Book = () => {
         ))}
       </div>
       {user && (
-        <form onSubmit={handleSubmitReview} style={{ marginTop: 20 }}>
-          <h3>{existingReview ? "Update" : "Add"} Your Review</h3>
-          <textarea
-            placeholder="Write a review"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            required
-          />
-          <br />
-          <input
-            type="number"
-            min="0"
-            max="5"
-            step="0.1"
-            value={rating}
-            onChange={(e) => setRating(e.target.value)}
-            placeholder="Rating (0-5)"
-            required
-          />
-          <br />
-          <button type="submit">
-            {existingReview ? "Update" : "Add"} Review
-          </button>
-          {existingReview && (
-            <button type="button" onClick={handleDeleteReview}>
-              Delete Review
-            </button>
-          )}
-          {reviewMessage && <p>{reviewMessage}</p>}
-        </form>
+        <form onSubmit={handleSubmitReview} style={styles.reviewForm}>
+  <h3 style={styles.reviewTitle}>
+    {existingReview ? "Update" : "Add"} Your Review
+  </h3>
+
+  <textarea
+    placeholder="Write a review"
+    value={comment}
+    onChange={(e) => setComment(e.target.value)}
+    required
+    style={styles.textarea}
+  />
+
+  <input
+    type="number"
+    min="0"
+    max="5"
+    step="0.1"
+    value={rating}
+    onChange={(e) => setRating(e.target.value)}
+    placeholder="Rating (0-5)"
+    required
+    style={styles.input}
+  />
+
+  <button type="submit" style={styles.submitButton}>
+    {existingReview ? "Update Review" : "Add Review"}
+  </button>
+
+  {existingReview && (
+    <button
+      type="button"
+      onClick={handleDeleteReview}
+      style={styles.deleteButton}
+    >
+      Delete Review
+    </button>
+  )}
+
+  {reviewMessage && <p style={styles.reviewMessage}>{reviewMessage}</p>}
+</form>
+
       )}
     </div>
   );
@@ -455,6 +466,74 @@ const styles = {
     border: "1px solid #ddd",
     borderRadius: "5px",
   },
+
+  reviewForm: {
+    marginTop: "30px",
+    padding: "20px",
+    backgroundColor: "#fff",
+    borderRadius: "10px",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "15px",
+    width: "100%",
+    maxWidth: "800px",
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
+  
+  reviewTitle: {
+    fontSize: "20px",
+    fontWeight: "bold",
+  },
+  
+  textarea: {
+    width: "100%",
+    minHeight: "100px",
+    padding: "10px",
+    fontSize: "16px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+    resize: "vertical",
+  },
+  
+  input: {
+    width: "150px",
+    padding: "10px",
+    fontSize: "16px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+  },
+  
+  submitButton: {
+    padding: "12px 30px",
+    fontSize: "16px",
+    backgroundColor: "#007BFF",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    transition: "background 0.3s",
+  },
+  
+  deleteButton: {
+    padding: "10px 20px",
+    backgroundColor: "#dc3545",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontWeight: "bold",
+  },
+  
+  reviewMessage: {
+    marginTop: "10px",
+    color: "#28a745",
+    fontWeight: "bold",
+  },
+  
 };
 
 export default Book;
