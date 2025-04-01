@@ -59,10 +59,13 @@ const CheckoutScreen = () => {
 
   //Validate Card Number (16 digits)
   const handleCardNumberChange = (e) => {
-    const formattedValue = formatCardNumber(e.target.value);
+    const numericValue = e.target.value.replace(/\D/g, "").slice(0, 16);
+
+    const formattedValue = numericValue.replace(/(.{4})/g, "$1 ").trim();
+
     setCreditCard({ ...creditCard, cardNumber: formattedValue });
 
-    const isValid = formattedValue.replace(/\s/g, "").length === 16;
+    const isValid = numericValue.length === 16;
     setErrors({ ...errors, cardNumber: isValid ? "" : "Card number must be 16 digits" });
   };
 
@@ -168,6 +171,7 @@ const CheckoutScreen = () => {
           placeholder="Card Number"
           value={creditCard.cardNumber}
           onChange={handleCardNumberChange}
+          maxLength={19}
           style={styles.input}
         />
         {errors.cardNumber && <p style={styles.error}>{errors.cardNumber}</p>}
