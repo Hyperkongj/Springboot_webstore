@@ -5,6 +5,7 @@ import com.buyandsellstore.app.model.Address;
 import com.buyandsellstore.app.model.CartItem;
 import com.buyandsellstore.app.model.Order;
 import com.buyandsellstore.app.model.Payment;
+import com.buyandsellstore.app.repository.CartRepository;
 import com.buyandsellstore.app.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,8 @@ import java.util.UUID;
 public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
+    @Autowired
+    private CartService cartService;
     public OrderResponse createOrder(String userId, List<CartItem> items, float totalPrice, Address billing, Address shipping, Payment payment) {
         try {
             // Create a new order
@@ -32,6 +35,7 @@ public class OrderService {
 
             // Save order to the repository
             orderRepository.save(order);
+            cartService.removeFromCart(userId, null, null);
 
             // Return success response
             return new OrderResponse(true, "Order created successfully", order);
