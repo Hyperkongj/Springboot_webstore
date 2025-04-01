@@ -87,20 +87,67 @@ const GET_WISHLIST_ITEMS = gql`
   }
 `;
 
+const ADD_REVIEW = gql`
+  mutation AddReview($bookId: ID!, $review: ReviewInput!) {
+    addReview(bookId: $bookId, review: $review) {
+      id
+      reviews {
+        reviewer
+        comment
+        rating
+      }
+    }
+  }
+`;
+
+const UPDATE_REVIEW = gql`
+  mutation UpdateReview($bookId: ID!, $reviewer: String!, $updatedReview: ReviewInput!) {
+    updateReview(bookId: $bookId, reviewer: $reviewer, updatedReview: $updatedReview) {
+      id
+      reviews {
+        reviewer
+        comment
+        rating
+      }
+    }
+  }
+`;
+
+const DELETE_REVIEW = gql`
+  mutation DeleteReview($bookId: ID!, $reviewer: String!) {
+    deleteReview(bookId: $bookId, reviewer: $reviewer) {
+      id
+      reviews {
+        reviewer
+        comment
+        rating
+      }
+    }
+  }
+`;
+
 const Book = () => {
   const { id } = useParams();
   const { user } = useUserContext();
   
-  const { loading, error, data } = useQuery(GET_BOOK_DETAILS, {
+  const { loading, error, data, refetch } = useQuery(GET_BOOK_DETAILS, {
     variables: { id },
   });
-  const { data: cartData, refetch: refetchCart } = useQuery(VIEW_CART, {
-    variables: { userId: user?.id || "" },
-    skip: !user?.id,
-  });
 
+  const book = data?.book;
+
+
+  const { data: cartData, refetch: refetchCart } = useQuery(VIEW_CART, {
+    variables: { userId: user?.id || "placeholder-id" }, // ✅ always runs
+  });
+    
+  //Mutations
   const [addToCart, { loading: addLoading }] = useMutation(ADD_TO_CART);
   const [removeFromCart, { loading: removeLoading }] = useMutation(REMOVE_FROM_CART);
+  const [addReview] = useMutation(ADD_REVIEW);
+  const [updateReview] = useMutation(UPDATE_REVIEW);
+  const [deleteReview] = useMutation(DELETE_REVIEW);
+
 
   // Updated mutation for adding to wishlist with cache update logic
   const [addWishlistItem, { loading: wishlistLoading }] = useMutation(
@@ -139,10 +186,14 @@ const Book = () => {
     }
   );
 
+  //Hooks
   const [cartMessage, setCartMessage] = useState("");
   const [wishlistMessage, setWishlistMessage] = useState("");
   const [cartQuantity, setCartQuantity] = useState(0);
-
+  const [comment, setComment] = useState("");
+  const [rating, setRating] = useState("");
+  const [reviewMessage, setReviewMessage] = useState("");
+const existingReview = book?.reviews.find((r) => r.reviewer === user?.username);
   useEffect(() => {
     if (cartData) {
       const bookInCart = cartData.cartItems.find((item) => item.itemId === id);
@@ -188,6 +239,9 @@ const Book = () => {
     }
   };
 
+  //if (loading) return <p>Loading book details...</p>;
+  //if (error) return <p>Error loading book details: {error.message}</p>;
+
   // Handler for adding a book to the wishlist
   const handleAddToWishlist = async () => {
     if (!user || !user.id) {
@@ -211,10 +265,47 @@ const Book = () => {
     }
   };
 
-  if (loading) return <p>Loading book details...</p>;
-  if (error) return <p>Error loading book details: {error.message}</p>;
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    if (!user?.username) return;
+    const review = { reviewer: user.username, comment, rating: parseFloat(rating) };
+  
+    try {
+      if (existingReview) {
+        await updateReview({ variables: { bookId: id, reviewer: user.username, updatedReview: review } });
+        setReviewMessage("Review updated successfully!");
+      } else {
+        await addReview({ variables: { bookId: id, review } });
+        setReviewMessage("Review added successfully!");
+      }
+      refetch();
+    } catch (err) {
+      setReviewMessage("Error saving review. Please try again.");
+      console.error(err);
+    }
+  };
+  
+  const handleDeleteReview = async () => {
+    try {
+      await deleteReview({ variables: { bookId: id, reviewer: user.username } });
+      setComment("");
+      setRating("");
+      setReviewMessage("Review deleted.");
+      refetch();
+    } catch (err) {
+      setReviewMessage("Failed to delete review.");
+      console.error(err);
+    }
+  };
+  
 
-  const { book } = data;
+
+  //if (loading) return <p>Loading book details...</p>;
+  //if (error) return <p>Error loading book details: {error.message}</p>;
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+  if (!book) return <p>Book not found.</p>;
 
   return (
     <div style={styles.container}>
@@ -269,8 +360,8 @@ const Book = () => {
       </div>
       <div style={styles.reviews}>
         <h2>Reviews</h2>
-        {book.reviews.map((review, index) => (
-          <div key={index} style={styles.review}>
+        {book.reviews.map((review, i) => (
+          <div key={i} style={styles.review}>
             <p>
               <strong>{review.reviewer}:</strong> {review.comment}
             </p>
@@ -280,6 +371,50 @@ const Book = () => {
           </div>
         ))}
       </div>
+      {user && (
+        <form onSubmit={handleSubmitReview} style={styles.reviewForm}>
+  <h3 style={styles.reviewTitle}>
+    {existingReview ? "Update" : "Add"} Your Review
+  </h3>
+
+  <textarea
+    placeholder="Write a review"
+    value={comment}
+    onChange={(e) => setComment(e.target.value)}
+    required
+    style={styles.textarea}
+  />
+
+  <input
+    type="number"
+    min="0"
+    max="5"
+    step="0.1"
+    value={rating}
+    onChange={(e) => setRating(e.target.value)}
+    placeholder="Rating (0-5)"
+    required
+    style={styles.input}
+  />
+
+  <button type="submit" style={styles.submitButton}>
+    {existingReview ? "Update Review" : "Add Review"}
+  </button>
+
+  {existingReview && (
+    <button
+      type="button"
+      onClick={handleDeleteReview}
+      style={styles.deleteButton}
+    >
+      Delete Review
+    </button>
+  )}
+
+  {reviewMessage && <p style={styles.reviewMessage}>{reviewMessage}</p>}
+</form>
+
+      )}
     </div>
   );
 };
@@ -331,6 +466,78 @@ const styles = {
     border: "1px solid #ddd",
     borderRadius: "5px",
   },
+
+  reviewForm: {
+    marginTop: "30px",
+    padding: "20px",
+    backgroundColor: "#fff",
+    borderRadius: "10px",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "15px",
+    width: "100%",
+    maxWidth: "800px",
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
+  
+  reviewTitle: {
+    fontSize: "20px",
+    fontWeight: "bold",
+  },
+  
+  textarea: {
+    width: "100%",
+    minHeight: "100px",
+    padding: "10px",
+    fontSize: "16px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+    resize: "vertical",
+  },
+  
+  input: {
+    width: "150px",
+    padding: "10px",
+    fontSize: "16px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+  },
+  
+  submitButton: {
+    padding: "12px 30px",
+    fontSize: "16px",
+    backgroundColor: "#007BFF",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    transition: "background 0.3s",
+  },
+  
+  deleteButton: {
+    padding: "10px 20px",
+    backgroundColor: "#dc3545",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontWeight: "bold",
+  },
+  
+  reviewMessage: {
+    marginTop: "10px",
+    color: "#28a745",
+    fontWeight: "bold",
+  },
+  
 };
 
 export default Book;
+export {
+  GET_BOOK_DETAILS,
+  ADD_REVIEW,
+};
