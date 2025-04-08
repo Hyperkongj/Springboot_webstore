@@ -53,7 +53,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-graphql</artifactId>
 		</dependency>
-		
+
         <!-- Web Starter -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

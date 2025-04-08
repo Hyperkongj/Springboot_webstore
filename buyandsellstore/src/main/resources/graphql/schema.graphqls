@@ -79,6 +79,15 @@ type Query {
     wishlistItems(userId: ID!): [WishlistItem!]!
     wishlistItem(id: ID!): WishlistItem
     wishlistCount(userId: ID!): Int!
+    getSellerStatistics(sellerId: ID!): SellerStats
+
+}
+
+type SellerStats {
+    totalBuyers: Int
+    totalPurchases: Int
+    totalRevenue: Float
+    purchasedBooks: [Book]
 }
 
 type Mutation {
