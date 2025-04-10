@@ -6,55 +6,51 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 
-@Document(collection = "books")
-public class Book {
+@Document(collection = "homeItems")
+public class HomeItem {
 
     @Id
     private String id; // Unique identifier for MongoDB
     private String title;
-    private String author;
+    private String type;
+    private String description;
     private double price;
     private String imageUrl;
-    private String description;
+    private String manufacturer;
     private double ratings;
     private String sellerId;
 
     private int totalQuantity;
+
     @Field("reviews") // MongoDB field for embedded reviews
     private List<Review> reviews;
-    public Book(){
 
+    public HomeItem() {
     }
-    public Book(String title, String author, double price, String imageUrl, String description, String sellerId) {
+
+    public HomeItem(String title, String type, String description, double price, String imageUrl, String manufacturer, String sellerId) {
         this.title = title;
-        this.author = author;
+        this.type = type;
+        this.description = description;
         this.price = price;
         this.imageUrl = imageUrl;
-        this.description = description;
+        this.manufacturer = manufacturer;
+        this.ratings = ratings;
         this.sellerId = sellerId;
     }
 
-    public Book(String title, String author, double price, String imageUrl, String description, String sellerId, int totalQuantity) {
+    public HomeItem(String title, String type, String description, double price, String imageUrl, String manufacturer, String sellerId, int totalQuantity) {
         this.title = title;
-        this.author = author;
+        this.type = type;
+        this.description = description;
         this.price = price;
         this.imageUrl = imageUrl;
-        this.description = description;
+        this.manufacturer = manufacturer;
+        this.ratings = ratings;
         this.sellerId = sellerId;
         this.totalQuantity = totalQuantity;
     }
 
-    public Book(String title, String author, double price, String imageUrl, String description, String sellerId, List<Review> reviews) {
-        this.title = title;
-        this.author = author;
-        this.price = price;
-        this.imageUrl = imageUrl;
-        this.description = description;
-        this.sellerId = sellerId;
-        this.reviews = reviews;
-    }
-
-    // Getters and Setters for all fields, including id
     public String getId() {
         return id;
     }
@@ -71,12 +67,20 @@ public class Book {
         this.title = title;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getType() {
+        return type;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public double getPrice() {
@@ -95,12 +99,12 @@ public class Book {
         this.imageUrl = imageUrl;
     }
 
-    public String getDescription() {
-        return description;
+    public String getManufacturer() {
+        return manufacturer;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setManufacturer(String manufacturer) {
+        this.manufacturer = manufacturer;
     }
 
     public double getRatings() {
@@ -109,14 +113,6 @@ public class Book {
 
     public void setRatings(double ratings) {
         this.ratings = ratings;
-    }
-
-    public List<Review> getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(List<Review> reviews) {
-        this.reviews = reviews;
     }
 
     public String getSellerId() {
@@ -135,17 +131,27 @@ public class Book {
         this.totalQuantity = totalQuantity;
     }
 
-    // Updated toString method to include the id
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+
     @Override
     public String toString() {
-        return "Book{" +
+        return "HomeItem{" +
                 "id='" + id + '\'' +
                 ", title='" + title + '\'' +
-                ", author='" + author + '\'' +
+                ", type='" + type + '\'' +
+                ", description='" + description + '\'' +
                 ", price=" + price +
                 ", imageUrl='" + imageUrl + '\'' +
-                ", description='" + description + '\'' +
+                ", manufacturer='" + manufacturer + '\'' +
                 ", ratings=" + ratings +
+                ", sellerId='" + sellerId + '\'' +
+                ", totalQuantity=" + totalQuantity +
                 ", reviews=" + reviews +
                 '}';
     }

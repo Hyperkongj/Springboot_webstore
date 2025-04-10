@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { gql, useMutation } from "@apollo/client";
-import { useUserContext } from "../context/UserContext"; // 👈 added this
+import { useUserContext } from "../context/UserContext";
 
+// 📚 Book Upload Mutation
 const UPLOAD_BOOK = gql`
   mutation UploadBook(
     $title: String!
     $author: String!
+    $totalQuantity: Int!
     $price: Float!
     $imageUrl: String!
     $description: String!
@@ -15,6 +17,7 @@ const UPLOAD_BOOK = gql`
     uploadBook(
       title: $title
       author: $author
+      totalQuantity: $totalQuantity
       price: $price
       imageUrl: $imageUrl
       description: $description
@@ -26,20 +29,50 @@ const UPLOAD_BOOK = gql`
   }
 `;
 
+// 🏠 Home Item Upload Mutation
+const UPLOAD_HOME_ITEM = gql`
+  mutation UploadHomeItem(
+    $title: String!
+    $description: String!
+    $price: Float!
+    $totalQuantity: Int!
+    $imageUrl: String!
+    $manufacturer: String!
+    $sellerId: String!
+    $type: String!
+  ) {
+    uploadHomeItem(
+      title: $title
+      description: $description
+      price: $price
+      totalQuantity: $totalQuantity
+      imageUrl: $imageUrl
+      manufacturer: $manufacturer
+      sellerId: $sellerId
+      type: $type
+    ) {
+      id
+      title
+    }
+  }
+`;
+
 const ManageInventory = () => {
-  const { user } = useUserContext(); // 👈 get user from context
+  const { user } = useUserContext();
+  const [uploadBook] = useMutation(UPLOAD_BOOK);
+  const [uploadHomeItem] = useMutation(UPLOAD_HOME_ITEM);
 
   const [form, setForm] = useState({
     title: "",
     author: "",
     price: "",
+    totalQuantity: "",
     imageUrl: "",
     description: "",
     type: "books",
     subcategory: "",
+    manufacturer: "",
   });
-
-  const [uploadBook] = useMutation(UPLOAD_BOOK);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -48,57 +81,115 @@ const ManageInventory = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user?.id) return alert("Seller ID missing. Please log in again.");
 
-    if (!user || !user.id) {
-      alert("Seller ID missing. Please log in again.");
-      return;
-    }
-
-    await uploadBook({
-      variables: {
+    try {
+      const baseVars = {
         title: form.title,
-        author: form.author,
         price: parseFloat(form.price),
+        totalQuantity: parseInt(form.totalQuantity),
         imageUrl: form.imageUrl,
         description: form.description,
-        sellerId: user.id, // 👈 set sellerId from context
-      },
-    });
+        sellerId: user.id,
+      };
 
-    setForm({
-      title: "",
-      author: "",
-      price: "",
-      imageUrl: "",
-      description: "",
-      type: "books",
-      subcategory: "",
-    });
+      if (form.type === "books") {
+        await uploadBook({
+          variables: {
+            ...baseVars,
+            author: form.author,
+          },
+        });
+      } else {
+        await uploadHomeItem({
+          variables: {
+            ...baseVars,
+            manufacturer: form.manufacturer,
+            type: form.type,
+          },
+        });
+      }
+
+      setForm({
+        title: "",
+        author: "",
+        price: "",
+        totalQuantity: "",
+        imageUrl: "",
+        description: "",
+        type: "books",
+        subcategory: "",
+        manufacturer: "",
+      });
+
+      alert("Item uploaded successfully!");
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Upload failed. Please try again.");
+    }
   };
 
   return (
     <Wrapper>
       <Card>
-        <Title>📤 Upload Book</Title>
+        <Title>📤 Upload {form.type === "books" ? "Book" : "Home Item"}</Title>
         <Form onSubmit={handleSubmit}>
-          <Input name="title" placeholder="Book Title" value={form.title} onChange={handleChange} required />
-          <Input name="author" placeholder="Author" value={form.author} onChange={handleChange} required />
-          <Input name="price" type="number" placeholder="Price" value={form.price} onChange={handleChange} required />
-          <Input name="imageUrl" placeholder="Image URL" value={form.imageUrl} onChange={handleChange} required />
-          <Textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} required />
-
           <Select name="type" value={form.type} onChange={handleChange}>
             <option value="books">Books</option>
             <option value="home">Home Item</option>
           </Select>
 
-          {form.type === "home" && (
-            <Select name="subcategory" value={form.subcategory} onChange={handleChange}>
-              <option value="">-- Select Subcategory --</option>
-              <option value="kitchen">Kitchen</option>
-              <option value="livingroom">Living Room</option>
-            </Select>
+          <Input name="title" placeholder="Title" value={form.title} onChange={handleChange} required />
+
+          {form.type === "books" && (
+            <Input name="author" placeholder="Author" value={form.author} onChange={handleChange} required />
           )}
+
+          <Textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} required />
+
+          <Input
+            name="price"
+            type="number"
+            step="0.01"
+            placeholder="Price per Item"
+            value={form.price}
+            onChange={handleChange}
+            required
+          />
+
+          <Input
+            name="totalQuantity"
+            type="number"
+            placeholder="Total Quantity"
+            value={form.totalQuantity}
+            onChange={handleChange}
+            required
+          />
+
+          {form.type === "home" && (
+            <>
+              <Input
+                name="manufacturer"
+                placeholder="Manufacturer"
+                value={form.manufacturer}
+                onChange={handleChange}
+                required
+              />
+              <Select name="subcategory" value={form.subcategory} onChange={handleChange}>
+                <option value="">-- Select Subcategory --</option>
+                <option value="kitchen">Kitchen</option>
+                <option value="livingroom">Living Room</option>
+              </Select>
+            </>
+          )}
+
+          <Input
+            name="imageUrl"
+            placeholder="Image URL"
+            value={form.imageUrl}
+            onChange={handleChange}
+            required
+          />
 
           {form.imageUrl && (
             <ImagePreview>
@@ -115,6 +206,7 @@ const ManageInventory = () => {
 
 export default ManageInventory;
 
+// 💅 Styled Components
 export const Wrapper = styled.div`
   display: flex;
   justify-content: center;
