@@ -7,6 +7,8 @@ public class CartItem {
     private int quantity; // Quantity of the item
     private double price; // Price of the item
     private String imageUrl; // Add this field
+    private String sellerId;
+    private String productName;
 
     // Constructors
     public CartItem() {
@@ -78,5 +80,16 @@ public class CartItem {
                 ", quantity=" + quantity +
                 ", price=" + price +
                 '}';
+    }
+    public String getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(String sellerId) {
+        this.sellerId = sellerId;
+    }
+
+    public String getProductName() {
+        return productName;
     }
 }

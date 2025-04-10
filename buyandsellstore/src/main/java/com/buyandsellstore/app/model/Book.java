@@ -17,6 +17,7 @@ public class Book {
     private String imageUrl;
     private String description;
     private double ratings;
+    private String sellerId;
 
     @Field("reviews") // MongoDB field for embedded reviews
     private List<Review> reviews;
@@ -84,6 +85,14 @@ public class Book {
 
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
+    }
+
+    public String getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(String sellerId) {
+        this.sellerId = sellerId;
     }
 
     // Updated toString method to include the id

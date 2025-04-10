@@ -34,6 +34,8 @@ import CheckoutScreen from "./screens/CheckoutScreen";
 
 // NEW: Import your new Wishlist screen
 import WishlistScreen from "./screens/WishlistScreen"; // <-- ADD THIS
+import SellerDashboard from "./screens/SellerDashboard";
+import SellerHome from "./screens/SellerHome";
 
 // Clean __typename from variables
 const cleanTypenameLink = new ApolloLink((operation, forward) => {
@@ -76,11 +78,16 @@ const AppRoutes = () => {
         <Route path="/signup" element={<SignUpScreen />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/seller-dashboard" element={<SellerDashboard />} />
 
         {/* Protected Routes */}
         <Route
           path="/home"
           element={user ? <HomeScreen /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/sellerHome"
+          element={user ? <SellerHome /> : <Navigate to="/login" replace />}
         />
         <Route
           path="/books"
