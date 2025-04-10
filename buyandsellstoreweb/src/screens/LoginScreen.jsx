@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import styled, { ThemeProvider } from "styled-components";
 import { useUserContext } from "../context/UserContext";
 
+// --- GraphQL Mutation ---
 const LOGIN_MUTATION = gql`
   mutation Login($username: String!, $password: String!) {
     login(username: $username, password: $password) {
@@ -38,7 +39,9 @@ const LOGIN_MUTATION = gql`
   }
 `;
 
+// --- Theme Objects ---
 const lightTheme = {
+  mode: "light",
   background: "#f4f6f8",
   cardBg: "#ffffff",
   text: "#121212",
@@ -51,6 +54,7 @@ const lightTheme = {
 };
 
 const darkTheme = {
+  mode: "dark",
   background: "#121212",
   cardBg: "#1e1e1e",
   text: "#ffffff",
@@ -62,11 +66,15 @@ const darkTheme = {
   error: "#ff6b6b",
 };
 
+// --- Main Component ---
 const LoginScreen = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSellerMode, setIsSellerMode] = useState(false);
+  const [themeMode, setThemeMode] = useState("light");
+  const theme = themeMode === "light" ? lightTheme : darkTheme;
+
   const { login: setUser } = useUserContext();
   const [login, { loading }] = useMutation(LOGIN_MUTATION);
   const navigate = useNavigate();
@@ -76,28 +84,24 @@ const LoginScreen = () => {
     setErrorMessage("");
 
     try {
-      const response = await login({ variables: { username, password } });
+      const { data } = await login({ variables: { username, password } });
+      const { success, message, user } = data.login;
 
-      if (response.data.login.success) {
-        const user = response.data.login.user;
-
+      if (success) {
         if (user.isSeller && !isSellerMode) {
-          setErrorMessage("This account is registered as a seller. Please check 'Login as Seller' to continue.");
+          setErrorMessage("This account is registered as a seller. Please check 'Login as Seller'.");
           return;
-        } else if (!user.isSeller && isSellerMode) {
-          setErrorMessage("This is a user account. Uncheck 'Login as Seller' to continue.");
+        }
+        if (!user.isSeller && isSellerMode) {
+          setErrorMessage("This is a user account. Uncheck 'Login as Seller'.");
           return;
         }
 
         setUser(user);
-        if (user.isSeller) {
-          localStorage.setItem("sellerId", user.id);
-          navigate("/sellerHome");
-        } else {
-          navigate("/home");
-        }
+        localStorage.setItem("sellerId", user.id);
+        navigate(user.isSeller ? "/sellerHome" : "/home");
       } else {
-        setErrorMessage(response.data.login.message || "Login failed");
+        setErrorMessage(message || "Login failed");
       }
     } catch (error) {
       console.error(error);
@@ -105,11 +109,22 @@ const LoginScreen = () => {
     }
   };
 
-  const theme = isSellerMode ? darkTheme : lightTheme;
-
   return (
     <ThemeProvider theme={theme}>
       <Wrapper>
+        <TopBar>
+          <AppName>Oops I Forgot</AppName>
+          <ThemeToggle>
+            <span>🌞</span>
+            <input
+              type="checkbox"
+              checked={themeMode === "dark"}
+              onChange={() => setThemeMode(themeMode === "light" ? "dark" : "light")}
+            />
+            <span>🌙</span>
+          </ThemeToggle>
+        </TopBar>
+
         <Card>
           <Title>Login</Title>
           <Form onSubmit={handleLogin}>
@@ -169,9 +184,35 @@ export const Wrapper = styled.div`
   background-color: ${({ theme }) => theme.background};
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   transition: background 0.3s ease;
+`;
+
+export const TopBar = styled.div`
+  width: 100%;
+  max-width: 420px;
+  padding: 20px 10px 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const AppName = styled.h2`
+  color: ${({ theme }) => theme.text};
+  font-size: 20px;
+  font-weight: bold;
+`;
+
+export const ThemeToggle = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  input {
+    cursor: pointer;
+    transform: scale(1.2);
+  }
 `;
 
 export const Card = styled.div`
@@ -181,7 +222,7 @@ export const Card = styled.div`
   border-radius: 16px;
   max-width: 400px;
   width: 90%;
-  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
   text-align: center;
 `;
 
@@ -218,6 +259,7 @@ export const Button = styled.button`
   border-radius: 8px;
   cursor: pointer;
   margin-top: 10px;
+  font-weight: 600;
   &:hover {
     opacity: 0.95;
   }

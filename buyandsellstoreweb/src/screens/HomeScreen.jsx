@@ -15,13 +15,19 @@ const HomeScreen = () => {
 
   return (
     <div style={styles.container}>
-      <h2>Explore Categories</h2>
+      <h2 style={styles.heading}>Explore Categories</h2>
       <div style={styles.grid}>
         {categories.map((category) => (
           <div
             key={category.name}
             style={styles.card}
             onClick={() => handleCategoryClick(category.path)}
+            role="button"
+            tabIndex={0}
+            aria-label={`Go to ${category.name}`}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleCategoryClick(category.path);
+            }}
           >
             <h3>{category.name}</h3>
           </div>
@@ -34,20 +40,33 @@ const HomeScreen = () => {
 const styles = {
   container: {
     textAlign: "center",
-    padding: "20px",
+    padding: "40px 20px",
+    maxWidth: "1200px",
+    margin: "0 auto",
+  },
+  heading: {
+    fontSize: "28px",
+    marginBottom: "30px",
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-    gap: "20px",
-    marginTop: "20px",
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+    gap: "24px",
   },
   card: {
-    backgroundColor: "#f0f0f0",
-    padding: "30px",
+    backgroundColor: "#ffffff",
+    padding: "30px 20px",
+    borderRadius: "12px",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
     cursor: "pointer",
-    borderRadius: "8px",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+    fontWeight: "bold",
+    fontSize: "18px",
+    color: "#333",
+  },
+  cardHover: {
+    transform: "scale(1.03)",
+    boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
   },
 };
 

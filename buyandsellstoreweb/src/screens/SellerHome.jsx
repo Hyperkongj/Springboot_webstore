@@ -18,7 +18,7 @@ const SellerHome = () => {
           <p>View charts and metrics of your sales performance.</p>
         </Tile>
 
-        <Tile onClick={() => navigate("/inventory")}>
+        <Tile onClick={() => navigate("/manageinventory")}>
           <h3>📦 Manage Inventory</h3>
           <p>Track, update, and organize your product inventory.</p>
         </Tile>

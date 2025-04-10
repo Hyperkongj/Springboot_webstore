@@ -5,6 +5,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 
 import {
@@ -27,17 +28,15 @@ import HomeScreen from "./screens/HomeScreen";
 import HomeItemsScreen from "./screens/HomeItemsScreen";
 import Header from "./components/Header";
 import CartScreen from "./screens/CartScreen";
-// Import the books list and detail components
-import Books from "./screens/BooksScreen"; // List of books
-import Book from "./screens/BookDetailScreen"; // Book detail view
+import Books from "./screens/BooksScreen";
+import Book from "./screens/BookDetailScreen";
 import CheckoutScreen from "./screens/CheckoutScreen";
-
-// NEW: Import your new Wishlist screen
-import WishlistScreen from "./screens/WishlistScreen"; // <-- ADD THIS
+import WishlistScreen from "./screens/WishlistScreen";
 import SellerDashboard from "./screens/SellerDashboard";
 import SellerHome from "./screens/SellerHome";
+import ManageInventory from "./screens/ManageInventory";
 
-// Clean __typename from variables
+// GraphQL Apollo Client setup
 const cleanTypenameLink = new ApolloLink((operation, forward) => {
   if (operation.variables) {
     operation.variables = omitDeep(operation.variables, "__typename");
@@ -45,101 +44,69 @@ const cleanTypenameLink = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
-// GraphQL link configuration
 const httpLink = new HttpLink({
   uri: "http://localhost:8080/graphql",
   credentials: "include",
 });
 
-// Apollo client
 const client = new ApolloClient({
   link: from([cleanTypenameLink, httpLink]),
   cache: new InMemoryCache(),
 });
 
-// Protected Route component to check authentication
+// Reusable Protected Route
 const ProtectedRoute = ({ children }) => {
   const { user } = useUserContext();
   return user ? children : <Navigate to="/login" replace />;
 };
 
-// Separated AppRoutes for better control
-const AppRoutes = () => {
+// Layout Wrapper to hide header on public pages
+const Layout = ({ children }) => {
   const { user } = useUserContext();
+  const location = useLocation();
+  const hideHeaderRoutes = ["/login", "/signup", "/forgotpassword", "/reset-password"];
+
+  const shouldHideHeader = hideHeaderRoutes.includes(location.pathname);
 
   return (
     <>
-      {/* Render Header only if the user is logged in */}
-      {user && <Header />}
-
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={<LoginScreen />} />
-        <Route path="/signup" element={<SignUpScreen />} />
-        <Route path="/forgotpassword" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/seller-dashboard" element={<SellerDashboard />} />
-
-        {/* Protected Routes */}
-        <Route
-          path="/home"
-          element={user ? <HomeScreen /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/sellerHome"
-          element={user ? <SellerHome /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/books"
-          element={user ? <Books /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/homeitems"
-          element={user ? <HomeItemsScreen /> : <Navigate to="/login" replace />}
-        />
-        {/* Book Detail Route */}
-        <Route
-          path="/book/:id"
-          element={user ? <Book /> : <Navigate to="/login" replace />}
-        />
-
-        {/* NEW: Wishlist (Protected) */}
-        <Route
-          path="/wishlist"
-          element={
-            <ProtectedRoute>
-              <WishlistScreen />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Catch-all: redirect based on login */}
-        <Route
-          path="*"
-          element={<Navigate to={user ? "/home" : "/login"} replace />}
-        />
-        <Route
-          path="/cart"
-          element={
-            <ProtectedRoute>
-              <CartScreen />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/checkoutScreen"
-          element={
-            <ProtectedRoute>
-              <CheckoutScreen />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+      {!shouldHideHeader && user && <Header />}
+      {children}
     </>
   );
 };
 
-// App component
+// All routes
+const AppRoutes = () => (
+  <Layout>
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/login" element={<LoginScreen />} />
+      <Route path="/signup" element={<SignUpScreen />} />
+      <Route path="/forgotpassword" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
+      {/* Optional Seller public access */}
+      <Route path="/seller-dashboard" element={<SellerDashboard />} />
+      <Route path="/manageinventory" element={<ManageInventory />} />
+
+      {/* Protected Routes */}
+      <Route path="/home" element={<ProtectedRoute><HomeScreen /></ProtectedRoute>} />
+      <Route path="/sellerHome" element={<ProtectedRoute><SellerHome /></ProtectedRoute>} />
+      <Route path="/books" element={<ProtectedRoute><Books /></ProtectedRoute>} />
+      <Route path="/book/:id" element={<ProtectedRoute><Book /></ProtectedRoute>} />
+      <Route path="/homeitems" element={<ProtectedRoute><HomeItemsScreen /></ProtectedRoute>} />
+      <Route path="/wishlist" element={<ProtectedRoute><WishlistScreen /></ProtectedRoute>} />
+      <Route path="/cart" element={<ProtectedRoute><CartScreen /></ProtectedRoute>} />
+      <Route path="/checkoutScreen" element={<ProtectedRoute><CheckoutScreen /></ProtectedRoute>} />
+
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/home" replace />} />
+    </Routes>
+  </Layout>
+);
+
+// Root App
 const App = () => (
   <ApolloProvider client={client}>
     <UserProvider>

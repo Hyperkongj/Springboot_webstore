@@ -21,6 +21,27 @@ public class Book {
 
     @Field("reviews") // MongoDB field for embedded reviews
     private List<Review> reviews;
+    public Book(){
+
+    }
+    public Book(String title, String author, double price, String imageUrl, String description, String sellerId) {
+        this.title = title;
+        this.author = author;
+        this.price = price;
+        this.imageUrl = imageUrl;
+        this.description = description;
+        this.sellerId = sellerId;
+    }
+
+    public Book(String title, String author, double price, String imageUrl, String description, String sellerId, List<Review> reviews) {
+        this.title = title;
+        this.author = author;
+        this.price = price;
+        this.imageUrl = imageUrl;
+        this.description = description;
+        this.sellerId = sellerId;
+        this.reviews = reviews;
+    }
 
     // Getters and Setters for all fields, including id
     public String getId() {

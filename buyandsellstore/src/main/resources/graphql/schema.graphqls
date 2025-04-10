@@ -24,6 +24,16 @@ type Order {
     createdAt: String!
 }
 
+input BookInput {
+    title: String!
+    author: String!
+    price: Float!
+    imageUrl: String!
+    description: String!
+    ratings: Float
+    sellerId: String!
+}
+
 input PaymentInput {
     cardNumber: String!
     expiry: String!
@@ -127,6 +137,12 @@ type Mutation {
 
     forgotPassword(email: String!): String
     resetPassword(token: String!, newPassword: String!): ResetPasswordResponse!
+    uploadBook(title: String!
+        author: String!
+        price: Float!
+        imageUrl: String!
+        description: String!
+        sellerId: String!): Book
 }
 
 type AuthResponse {
