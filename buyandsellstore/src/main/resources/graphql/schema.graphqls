@@ -139,10 +139,21 @@ type Mutation {
     resetPassword(token: String!, newPassword: String!): ResetPasswordResponse!
     uploadBook(title: String!
         author: String!
+        totalQuantity: Int!
         price: Float!
         imageUrl: String!
         description: String!
         sellerId: String!): Book
+
+    uploadHomeItem(title: String!
+        description: String!
+        totalQuantity: Int!
+        price: Float!
+        imageUrl: String!
+        manufacturer: String!
+        sellerId: String!
+        type: String!
+    ): Book
 }
 
 type AuthResponse {
