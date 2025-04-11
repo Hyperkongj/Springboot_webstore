@@ -112,7 +112,7 @@ const CartScreen = () => {
                 <li key={index} style={styles.listItem}>
                   <div style={styles.itemDetails}>
                     <img
-                      src={`http://localhost:8080${item.imageUrl}`}
+                      src={`${item.imageUrl}`}
                       alt={item.name}
                       style={styles.itemImage}
                     />

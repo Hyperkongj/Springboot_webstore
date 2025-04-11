@@ -12,15 +12,23 @@ const Header = () => {
     navigate("/login");
   };
 
+  const handleHomeClick = () => {
+    if (user?.isSeller) {
+      navigate("/sellerHome");
+    } else {
+      navigate("/home");
+    }
+  };
+
   return (
     <header style={styles.header}>
       <h2
         style={{ ...styles.title, ...(isHovered ? styles.iconHover : {}) }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        onClick={() => navigate("/home")}
+        onClick={handleHomeClick}
       >
-        Buy&Sell Home
+        Buy&Sell Store
       </h2>
       <div style={styles.nav}>
         {user && (
@@ -28,7 +36,6 @@ const Header = () => {
             <span style={styles.welcome}>Welcome, {user.firstName}</span>
             <Link to="/profile" style={styles.icon}>👤</Link>
             <Link to="/cart" style={styles.icon}>🛒</Link>
-            {/* NEW: Wishlist Link */}
             <Link to="/wishlist" style={styles.icon}>❤️</Link>
             <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
           </>
@@ -49,7 +56,8 @@ const styles = {
   },
   title: {
     margin: 0,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    cursor: "pointer"
   },
   nav: {
     display: "flex",
@@ -72,7 +80,7 @@ const styles = {
     borderRadius: "4px"
   },
   iconHover: {
-    border: "2px solid black" // Square border on hover
+    border: "2px solid black"
   },
 };
 

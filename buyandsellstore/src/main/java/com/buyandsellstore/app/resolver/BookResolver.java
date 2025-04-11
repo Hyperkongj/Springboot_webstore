@@ -1,4 +1,5 @@
 package com.buyandsellstore.app.resolver;
+
 import com.buyandsellstore.app.model.Book;
 import com.buyandsellstore.app.repository.BookRepository;
 import com.buyandsellstore.app.model.Review;
@@ -9,6 +10,7 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -43,5 +45,12 @@ public class BookResolver {
     @MutationMapping
     public Book deleteReview(@Argument String bookId, @Argument String reviewer) {
         return bookService.deleteReview(bookId, reviewer);
+    }
+
+    @MutationMapping
+    public Book uploadBook(@Argument String title, @Argument String author, @Argument int totalQuantity, @Argument double price, @Argument String imageUrl, @Argument String description, @Argument String sellerId) {
+        Book book = new Book(title, author, price, imageUrl, description, sellerId, totalQuantity);
+        book.setReviews(new ArrayList<>());
+        return bookService.save(book);
     }
 }

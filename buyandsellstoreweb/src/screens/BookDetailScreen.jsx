@@ -311,7 +311,7 @@ const existingReview = book?.reviews.find((r) => r.reviewer === user?.username);
     <div style={styles.container}>
       <div style={styles.bookDetails}>
         <img
-          src={`${API_BASE_URL}${book.imageUrl}`}
+          src={`${book.imageUrl}`}
           alt={book.title}
           style={styles.bookImage}
         />

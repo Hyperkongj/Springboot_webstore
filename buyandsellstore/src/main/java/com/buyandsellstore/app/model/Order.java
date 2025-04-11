@@ -17,6 +17,8 @@ public class Order {
     private Address shipping;
     private Payment payment;
     private Date createdAt;
+    private String sellerId;
+
 
     public Order() {
     }
@@ -107,5 +109,13 @@ public class Order {
                 ", payment=" + payment +
                 ", createdAt='" + createdAt + '\'' +
                 '}';
+    }
+
+    public String getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(String sellerId) {
+        this.sellerId = sellerId;
     }
 }

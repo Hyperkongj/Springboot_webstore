@@ -46,7 +46,7 @@ const Books = () => {
             onClick={() => navigate(`/book/${book.id}`)}
           >
             <img
-              src={`${API_BASE_URL}${book.imageUrl}`}
+              src={`${book.imageUrl}`}
               alt={book.title}
               style={styles.bookImage}
             />
