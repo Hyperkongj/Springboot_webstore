@@ -63,54 +63,6 @@ public class UserResolver {
         return userService.createUser(new User(username, email, password, firstName, lastName, phone, isSeller));
     }
 
-    // @MutationMapping
-    // public User updateUser(
-    // @Argument String id,
-    // @Argument String phone,
-    // @Argument String profilePictureUrl,
-    // @Argument List<AddressInput> billing,
-    // @Argument List<AddressInput> shipping,
-    // @Argument Integer primaryBillingIndex,
-    // @Argument Integer primaryShippingIndex) {
-    // List<Address> billingAddresses = Optional.ofNullable(billing)
-    // .orElse(Collections.emptyList())
-    // .stream()
-    // .map(input -> new Address(
-    // input.getType(),
-    // input.getStreet(),
-    // input.getCity(),
-    // input.getState(),
-    // input.getZip(),
-    // input.getCountry()))
-    // .collect(Collectors.toList());
-
-    // List<Address> shippingAddresses = Optional.ofNullable(shipping)
-    // .orElse(Collections.emptyList())
-    // .stream()
-    // .map(input -> new Address(
-    // input.getType(),
-    // input.getStreet(),
-    // input.getCity(),
-    // input.getState(),
-    // input.getZip(),
-    // input.getCountry()))
-    // .collect(Collectors.toList());
-
-    // try {
-    // return userService.updateUser(
-    // id,
-    // phone,
-    // profilePictureUrl,
-    // billingAddresses,
-    // shippingAddresses,
-    // primaryBillingIndex,
-    // primaryShippingIndex);
-    // } catch (Exception e) {
-    // // Rethrow or wrap in a GraphQL‑friendly exception
-    // throw e;
-    // }
-    // }
-
     @MutationMapping
     public User updateUser(
             @Argument String id,
