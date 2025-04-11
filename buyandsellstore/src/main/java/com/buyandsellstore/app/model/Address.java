@@ -1,12 +1,12 @@
 package com.buyandsellstore.app.model;
 
 public class Address {
-    String type;
-    String street;
-    String city;
-    String state;
-    int zip;
-    String country;
+    private String type; // e.g. "Home", "Office"
+    private String street;
+    private String city;
+    private String state;
+    private int zip;
+    private String country;
 
     public Address() {
     }
@@ -19,6 +19,8 @@ public class Address {
         this.zip = zip;
         this.country = country;
     }
+
+    // Getters and setters
 
     public String getType() {
         return type;

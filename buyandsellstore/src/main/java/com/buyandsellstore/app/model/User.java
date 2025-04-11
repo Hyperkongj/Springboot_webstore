@@ -29,7 +29,9 @@ public class User {
 
     private List<Address> billing = new ArrayList<>();
     private List<Address> shipping = new ArrayList<>();
-
+    private Integer primaryBillingIndex;
+    private Integer primaryShippingIndex;
+    private String profilePictureUrl;
     private String resetToken;
 
     // Default Constructor
@@ -143,6 +145,30 @@ public class User {
 
     public void setShipping(List<Address> shipping) {
         this.shipping = shipping;
+    }
+
+    public Integer getPrimaryBillingIndex() {
+        return primaryBillingIndex;
+    }
+
+    public void setPrimaryBillingIndex(Integer primaryBillingIndex) {
+        this.primaryBillingIndex = primaryBillingIndex;
+    }
+
+    public Integer getPrimaryShippingIndex() {
+        return primaryShippingIndex;
+    }
+
+    public void setPrimaryShippingIndex(Integer primaryShippingIndex) {
+        this.primaryShippingIndex = primaryShippingIndex;
+    }
+
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
     }
 
     public String getResetToken() {
