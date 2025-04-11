@@ -35,8 +35,9 @@ import WishlistScreen from "./screens/WishlistScreen";
 import SellerDashboard from "./screens/SellerDashboard";
 import SellerHome from "./screens/SellerHome";
 import ManageInventory from "./screens/ManageInventory";
+import ProfileScreen from "./screens/ProfileScreen";
 
-// GraphQL Apollo Client setup
+// Strip __typename before sending variables
 const cleanTypenameLink = new ApolloLink((operation, forward) => {
   if (operation.variables) {
     operation.variables = omitDeep(operation.variables, "__typename");
@@ -54,18 +55,22 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-// Reusable Protected Route
+// Redirect to /login if not authenticated
 const ProtectedRoute = ({ children }) => {
   const { user } = useUserContext();
   return user ? children : <Navigate to="/login" replace />;
 };
 
-// Layout Wrapper to hide header on public pages
+// Hide header on public pages
 const Layout = ({ children }) => {
   const { user } = useUserContext();
   const location = useLocation();
-  const hideHeaderRoutes = ["/login", "/signup", "/forgotpassword", "/reset-password"];
-
+  const hideHeaderRoutes = [
+    "/login",
+    "/signup",
+    "/forgotpassword",
+    "/reset-password",
+  ];
   const shouldHideHeader = hideHeaderRoutes.includes(location.pathname);
 
   return (
@@ -76,37 +81,99 @@ const Layout = ({ children }) => {
   );
 };
 
-// All routes
 const AppRoutes = () => (
   <Layout>
     <Routes>
-      {/* Public Routes */}
+      {/* Public */}
       <Route path="/login" element={<LoginScreen />} />
       <Route path="/signup" element={<SignUpScreen />} />
       <Route path="/forgotpassword" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
 
-      {/* Optional Seller public access */}
+      {/* Seller Public */}
       <Route path="/seller-dashboard" element={<SellerDashboard />} />
       <Route path="/manageinventory" element={<ManageInventory />} />
 
-      {/* Protected Routes */}
-      <Route path="/home" element={<ProtectedRoute><HomeScreen /></ProtectedRoute>} />
-      <Route path="/sellerHome" element={<ProtectedRoute><SellerHome /></ProtectedRoute>} />
-      <Route path="/books" element={<ProtectedRoute><Books /></ProtectedRoute>} />
-      <Route path="/book/:id" element={<ProtectedRoute><Book /></ProtectedRoute>} />
-      <Route path="/homeitems" element={<ProtectedRoute><HomeItemsScreen /></ProtectedRoute>} />
-      <Route path="/wishlist" element={<ProtectedRoute><WishlistScreen /></ProtectedRoute>} />
-      <Route path="/cart" element={<ProtectedRoute><CartScreen /></ProtectedRoute>} />
-      <Route path="/checkoutScreen" element={<ProtectedRoute><CheckoutScreen /></ProtectedRoute>} />
+      {/* Protected */}
+      <Route
+        path="/home"
+        element={
+          <ProtectedRoute>
+            <HomeScreen />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/sellerHome"
+        element={
+          <ProtectedRoute>
+            <SellerHome />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/books"
+        element={
+          <ProtectedRoute>
+            <Books />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/book/:id"
+        element={
+          <ProtectedRoute>
+            <Book />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/homeitems"
+        element={
+          <ProtectedRoute>
+            <HomeItemsScreen />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/wishlist"
+        element={
+          <ProtectedRoute>
+            <WishlistScreen />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cart"
+        element={
+          <ProtectedRoute>
+            <CartScreen />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/checkoutScreen"
+        element={
+          <ProtectedRoute>
+            <CheckoutScreen />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <ProfileScreen />
+          </ProtectedRoute>
+        }
+      />
 
-      {/* Catch-all */}
+      {/* Fallback */}
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   </Layout>
 );
 
-// Root App
 const App = () => (
   <ApolloProvider client={client}>
     <UserProvider>

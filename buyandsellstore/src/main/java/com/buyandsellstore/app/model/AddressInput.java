@@ -1,17 +1,17 @@
 package com.buyandsellstore.app.model;
 
-public class Address {
-    private String type; // e.g. "Home", "Office"
+public class AddressInput {
+    private String type;
     private String street;
     private String city;
     private String state;
     private int zip;
     private String country;
 
-    public Address() {
+    public AddressInput() {
     }
 
-    public Address(String type, String street, String city, String state, int zip, String country) {
+    public AddressInput(String type, String street, String city, String state, int zip, String country) {
         this.type = type;
         this.street = street;
         this.city = city;
@@ -19,8 +19,6 @@ public class Address {
         this.zip = zip;
         this.country = country;
     }
-
-    // Getters and setters
 
     public String getType() {
         return type;
@@ -72,7 +70,7 @@ public class Address {
 
     @Override
     public String toString() {
-        return "Address{" +
+        return "AddressInput{" +
                 "type='" + type + '\'' +
                 ", street='" + street + '\'' +
                 ", city='" + city + '\'' +
