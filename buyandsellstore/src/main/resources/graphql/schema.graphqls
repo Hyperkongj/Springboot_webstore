@@ -118,6 +118,19 @@ type Mutation {
 
     forgotPassword(email: String!): String
     resetPassword(token: String!, newPassword: String!): ResetPasswordResponse!
+    
+    # Profile Page
+    updateUser(
+        id: ID!
+        phone: String
+        profilePictureUrl: String
+        billing: [AddressInput]
+        shipping: [AddressInput]
+        primaryBillingIndex: Int
+        primaryShippingIndex: Int
+    ): User
+
+    
 }
 
 type AuthResponse {
@@ -132,17 +145,19 @@ type ResetPasswordResponse {
 }
 
 type User {
-    id: ID!
-    username: String!
-    email: String!
-    firstName: String
-    lastName: String
-    isSeller: Boolean
-    phone: String!
-    billing: [AddressOutput]
-    shipping: [AddressOutput]
+  id: ID!
+  username: String!
+  email: String!
+  phone: String
+  firstName: String
+  lastName: String
+  isSeller: Boolean
+  billing: [AddressOutput]
+  shipping: [AddressOutput]
+  primaryBillingIndex: Int
+  primaryShippingIndex: Int
+  profilePictureUrl: String
 }
-
 type Book {
     id: ID!
     title: String!
@@ -180,3 +195,13 @@ type OrderResponse {
     order: Order
     reviews: [Review!]
 }
+
+input AddressInput {
+  type: String!        # e.g. "HOME", "WORK"
+  street: String!
+  city: String!
+  state: String!
+  zip: Int!
+  country: String!
+}
+

@@ -31,7 +31,7 @@ import CartScreen from "./screens/CartScreen";
 import Books from "./screens/BooksScreen"; // List of books
 import Book from "./screens/BookDetailScreen"; // Book detail view
 import CheckoutScreen from "./screens/CheckoutScreen";
-
+import ProfileScreen from "./screens/ProfileScreen"
 // NEW: Import your new Wishlist screen
 import WishlistScreen from "./screens/WishlistScreen"; // <-- ADD THIS
 
@@ -105,6 +105,18 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
+
+         {/* NEW: Profile (Protected) */}
+         <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfileScreen />
+            </ProtectedRoute>
+          }
+        />
+
+
 
         {/* Catch-all: redirect based on login */}
         <Route
