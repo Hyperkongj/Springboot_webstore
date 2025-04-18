@@ -5,6 +5,7 @@ import com.buyandsellstore.app.model.Cart;
 import com.buyandsellstore.app.model.CartItem;
 import com.buyandsellstore.app.repository.BookRepository;
 import com.buyandsellstore.app.repository.CartRepository;
+import com.buyandsellstore.app.repository.HomeItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,9 @@ public class CartService {
 
     @Autowired
     private BookRepository bookRepository; // For fetching book details if the type is 'book'
+
+    @Autowired
+    private HomeItemRepository homeItemRepository; // For fetching book details if the type is 'book'
 
     public ResponseMessage addToCart(String userId, String itemId, String type) {
         // Fetch the existing cart for the user
@@ -58,7 +62,14 @@ public class CartService {
                     cartItem.setQuantity(1); // Default to 1
                     cartItem.setImageUrl(book.getImageUrl()); // Default to 1
                 });
-            } else {
+            } else if ("home".equalsIgnoreCase(type)) {
+                homeItemRepository.findById(itemId).ifPresent(homeItem -> {
+                    cartItem.setName(homeItem.getTitle());
+                    cartItem.setPrice(homeItem.getPrice());
+                    cartItem.setQuantity(1); // Default to 1
+                    cartItem.setImageUrl(homeItem.getImageUrl()); // Default to 1
+                });
+            }else {
                 // For other types, add custom logic here
                 cartItem.setName("Unknown Item");
                 cartItem.setPrice(0.0);

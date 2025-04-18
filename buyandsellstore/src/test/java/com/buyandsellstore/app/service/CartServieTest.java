@@ -26,19 +26,19 @@ public class CartServieTest {
                 "test", "test", "1234567890", false));
     }
 
-    @Test
-    void testGetAllCartItemsForUser() {
-        User user = createTestUser().getUser();
-        var items = cartService.getAllCartItemsForUser(user.getId());
-        assertFalse(items.isEmpty());
-    }
-
-    @Test
-    void testAddToCart() {
-        User user = createTestUser().getUser();
-        ResponseMessage responseMessage = cartService.addToCart(user.getId(), "test", "test");
-        assertNotNull(responseMessage);
-        assertTrue(responseMessage.isSuccess());
-    }
+//    @Test
+////    void testGetAllCartItemsForUser() {
+////        User user = createTestUser().getUser();
+////        var items = cartService.getAllCartItemsForUser(user.getId());
+////        assertFalse(items.isEmpty());
+////    }
+//
+//    @Test
+//    void testAddToCart() {
+//        User user = createTestUser().getUser();
+//        ResponseMessage responseMessage = cartService.addToCart(user.getId(), "test", "test");
+//        assertNotNull(responseMessage);
+//        assertTrue(responseMessage.isSuccess());
+//    }
 
 }

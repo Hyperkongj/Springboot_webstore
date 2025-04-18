@@ -1,0 +1,55 @@
+/* Container padding and typography */
+.home-items-container {
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  /* Grid layout for items */
+  .home-items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  
+  /* Individual item card */
+  .home-item-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+  }
+  
+  .home-item-card:hover {
+    transform: scale(1.02);
+  }
+  
+  /* Item image */
+  .home-item-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+  
+  /* Title and details */
+  .home-item-title {
+    font-size: 1.1em;
+    margin: 10px 0 5px;
+    color: #333;
+  }
+  
+  .home-item-price {
+    font-weight: bold;
+    margin: 0;
+    color: #007b5e;
+  }
+  
+  .home-item-manufacturer,
+  .home-item-rating {
+    font-size: 0.9em;
+    margin: 4px 0;
+    color: #666;
+  }
+  

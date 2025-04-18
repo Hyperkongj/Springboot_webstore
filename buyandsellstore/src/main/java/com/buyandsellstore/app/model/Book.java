@@ -12,6 +12,7 @@ public class Book {
     @Id
     private String id; // Unique identifier for MongoDB
     private String title;
+    private String type;
     private String author;
     private double price;
     private String imageUrl;
@@ -25,13 +26,14 @@ public class Book {
     public Book(){
 
     }
-    public Book(String title, String author, double price, String imageUrl, String description, String sellerId) {
+    public Book(String title, String author, double price, String imageUrl, String description, String sellerId, String type) {
         this.title = title;
         this.author = author;
         this.price = price;
         this.imageUrl = imageUrl;
         this.description = description;
         this.sellerId = sellerId;
+        this.type = type;
     }
 
     public Book(String title, String author, double price, String imageUrl, String description, String sellerId, int totalQuantity) {
@@ -135,17 +137,27 @@ public class Book {
         this.totalQuantity = totalQuantity;
     }
 
-    // Updated toString method to include the id
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         return "Book{" +
                 "id='" + id + '\'' +
                 ", title='" + title + '\'' +
+                ", type='" + type + '\'' +
                 ", author='" + author + '\'' +
                 ", price=" + price +
                 ", imageUrl='" + imageUrl + '\'' +
                 ", description='" + description + '\'' +
                 ", ratings=" + ratings +
+                ", sellerId='" + sellerId + '\'' +
+                ", totalQuantity=" + totalQuantity +
                 ", reviews=" + reviews +
                 '}';
     }
