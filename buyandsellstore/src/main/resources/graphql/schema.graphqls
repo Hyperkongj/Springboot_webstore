@@ -90,7 +90,8 @@ type Query {
     wishlistItem(id: ID!): WishlistItem
     wishlistCount(userId: ID!): Int!
     getSellerStatistics(sellerId: ID!): SellerStats
-
+    homeItems: [HomeItem!]!
+    homeItem(id: ID!): HomeItem
 }
 
 type SellerStats {
@@ -203,6 +204,20 @@ type Book {
     description: String
     ratings: Float!
     reviews: [Review!]
+}
+
+type HomeItem {
+    id: ID!
+    title: String!
+    type: String!
+    description: String!
+    price: Float!
+    imageUrl: String!
+    manufacturer: String!
+    ratings: Float!
+    reviews: [Review!]
+    sellerId: String!
+    totalQuantity: Int!
 }
 
 type CartItem {

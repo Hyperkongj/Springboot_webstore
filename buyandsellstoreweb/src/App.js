@@ -26,6 +26,7 @@ import ForgotPassword from "./screens/ForgotPasswordScreen";
 import ResetPassword from "./screens/ResetPasswordScreen";
 import HomeScreen from "./screens/HomeScreen";
 import HomeItemsScreen from "./screens/HomeItemsScreen";
+import HomeItem from "./screens/HomeItem";
 import Header from "./components/Header";
 import CartScreen from "./screens/CartScreen";
 import Books from "./screens/BooksScreen";
@@ -167,6 +168,7 @@ const AppRoutes = () => (
           </ProtectedRoute>
         }
       />
+      <Route path="/home-item/:id" element={<HomeItem />} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/home" replace />} />
