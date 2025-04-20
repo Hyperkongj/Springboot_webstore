@@ -8,4 +8,7 @@ import org.springframework.stereotype.Repository;
 public interface HomeItemRepository extends MongoRepository<HomeItem, String> {
 
     HomeItem findByType(String type);
+    HomeItem findByManufacturer(String manufacturer);
+
+    HomeItem findBySellerId(String sellerId);
 }
