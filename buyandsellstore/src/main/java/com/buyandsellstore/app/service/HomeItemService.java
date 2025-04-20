@@ -24,6 +24,13 @@ public class HomeItemService {
         return homeItemRepository.findByType(type);
     }
 
+    public HomeItem findBySellerId(String sellerId) {
+        return homeItemRepository.findBySellerId(sellerId);
+    }
+    public HomeItem findByManufacturer(String manufacturer) {
+        return homeItemRepository.findByManufacturer(manufacturer);
+    }
+
     public HomeItem save(HomeItem homeItem){
         return homeItemRepository.save(homeItem);
     }

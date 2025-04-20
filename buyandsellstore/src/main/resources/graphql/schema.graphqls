@@ -89,17 +89,10 @@ type Query {
     wishlistItems(userId: ID!): [WishlistItem!]!
     wishlistItem(id: ID!): WishlistItem
     wishlistCount(userId: ID!): Int!
-    getSellerStatistics(sellerId: ID!): SellerStats
     homeItems: [HomeItem!]!
     homeItem(id: ID!): HomeItem
 }
 
-type SellerStats {
-    totalBuyers: Int
-    totalPurchases: Int
-    totalRevenue: Float
-    purchasedBooks: [Book]
-}
 
 type Mutation {
     login(username: String!, password: String!): AuthResponse
@@ -157,7 +150,7 @@ type Mutation {
         price: Float!
         imageUrl: String!
         description: String!
-        sellerId: String!): Book
+        sellerId: String!): UploadBookResponse
 
     uploadHomeItem(title: String!
         description: String!
@@ -167,7 +160,19 @@ type Mutation {
         manufacturer: String!
         sellerId: String!
         type: String!
-    ): Book
+    ): UploadHomeItemResponse
+}
+
+type UploadBookResponse {
+    success: Boolean!
+    message: String!
+    book: Book
+}
+
+type UploadHomeItemResponse {
+    success: Boolean!
+    message: String!
+    homeItem: HomeItem
 }
 
 type AuthResponse {

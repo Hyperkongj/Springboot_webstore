@@ -35,8 +35,9 @@ import CheckoutScreen from "./screens/CheckoutScreen";
 import WishlistScreen from "./screens/WishlistScreen";
 import SellerDashboard from "./screens/SellerDashboard";
 import SellerHome from "./screens/SellerHome";
-import ManageInventory from "./screens/ManageInventory";
+import UploadItems from "./screens/UploadItems";
 import ProfileScreen from "./screens/ProfileScreen";
+import ManageInventory from "./screens/ManageInventory";
 
 // Strip __typename before sending variables
 const cleanTypenameLink = new ApolloLink((operation, forward) => {
@@ -94,6 +95,7 @@ const AppRoutes = () => (
       {/* Seller Public */}
       <Route path="/seller-dashboard" element={<SellerDashboard />} />
       <Route path="/manageinventory" element={<ManageInventory />} />
+      <Route path="/uploadItems" element={<UploadItems />} />
 
       {/* Protected */}
       <Route

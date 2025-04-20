@@ -23,6 +23,10 @@ public class BookService {
         return bookRepository.findById(id).orElse(null);
     }
 
+    public Book findByTitleAndSellerId(String title, String sellerId) {
+        return bookRepository.findByTitleAndSellerId( title,  sellerId);
+    }
+
     // Add a review to a book
     public Book addReview(String bookId, Review newReview) {
         Book book = bookRepository.findById(bookId).orElse(null);

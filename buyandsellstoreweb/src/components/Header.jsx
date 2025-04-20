@@ -34,10 +34,26 @@ const Header = () => {
         {user && (
           <>
             <span style={styles.welcome}>Welcome, {user.firstName}</span>
-            <Link to="/profile" style={styles.icon}>👤</Link>
-            <Link to="/cart" style={styles.icon}>🛒</Link>
-            <Link to="/wishlist" style={styles.icon}>❤️</Link>
-            <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
+            <Link to="/profile" style={styles.icon}>
+              {user?.profilePictureUrl ? (
+                <img
+                  src={user.profilePictureUrl}
+                  alt="Profile"
+                  style={styles.profileImage}
+                />
+              ) : (
+                "👤"
+              )}
+            </Link>
+            <Link to="/cart" style={styles.icon}>
+              🛒
+            </Link>
+            <Link to="/wishlist" style={styles.icon}>
+              ❤️
+            </Link>
+            <button onClick={handleLogout} style={styles.logoutBtn}>
+              Logout
+            </button>
           </>
         )}
       </div>
@@ -52,35 +68,45 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    borderBottom: "1px solid #ccc"
+    borderBottom: "1px solid #ccc",
   },
   title: {
     margin: 0,
     fontWeight: "bold",
-    cursor: "pointer"
+    cursor: "pointer",
   },
   nav: {
     display: "flex",
     alignItems: "center",
-    gap: "15px"
+    gap: "15px",
   },
   welcome: {
-    fontWeight: "500"
+    fontWeight: "500",
   },
   icon: {
-    fontSize: "20px",
-    textDecoration: "none"
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textDecoration: "none",
+    padding: "4px",
   },
+  
+  profileImage: {
+    width: "32px",
+    height: "32px",
+    borderRadius: "50%",
+    objectFit: "cover",
+  },  
   logoutBtn: {
     padding: "5px 10px",
     backgroundColor: "#dc3545",
     color: "#fff",
     border: "none",
     cursor: "pointer",
-    borderRadius: "4px"
+    borderRadius: "4px",
   },
   iconHover: {
-    border: "2px solid black"
+    border: "2px solid black",
   },
 };
 
