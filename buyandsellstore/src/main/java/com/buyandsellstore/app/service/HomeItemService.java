@@ -24,9 +24,11 @@ public class HomeItemService {
         return homeItemRepository.findByType(type);
     }
 
-    public HomeItem findBySellerId(String sellerId) {
+    public List<HomeItem> findBySellerId(String sellerId) {
         return homeItemRepository.findBySellerId(sellerId);
     }
+
+    public HomeItem findByTitleAndSellerId(String title, String sellerId) {return  homeItemRepository.findByTitleAndSellerId(title, sellerId);}
     public HomeItem findByManufacturer(String manufacturer) {
         return homeItemRepository.findByManufacturer(manufacturer);
     }

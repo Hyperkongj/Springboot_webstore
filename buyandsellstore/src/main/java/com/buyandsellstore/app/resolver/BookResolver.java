@@ -31,6 +31,11 @@ public class BookResolver {
         return bookService.getBookById(id);
     }
 
+    @QueryMapping
+    public List<Book> getBooksBySellerId(@Argument String sellerId) {
+        return bookService.getBooksBySellerID(sellerId);
+    }
+
     // Mutations for Reviews
 
     @MutationMapping
