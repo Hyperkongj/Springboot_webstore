@@ -91,6 +91,8 @@ type Query {
     wishlistCount(userId: ID!): Int!
     homeItems: [HomeItem!]!
     homeItem(id: ID!): HomeItem
+    getBooksBySellerId(sellerId: String!): [Book!]!
+    getHomeItemsBySellerId(sellerId: String!): [HomeItem!]!
 }
 
 
@@ -200,16 +202,31 @@ type User {
   primaryShippingIndex: Int
   profilePictureUrl: String
 }
+
 type Book {
     id: ID!
     title: String!
+    type: String
     author: String!
     price: Float!
     imageUrl: String!
     description: String
     ratings: Float!
+    sellerId: String
+    totalQuantity: Int
     reviews: [Review!]
 }
+
+#type Book {
+#    id: ID!
+#    title: String!
+#    author: String!
+#    price: Float!
+#    imageUrl: String!
+#    description: String
+#    ratings: Float!
+#    reviews: [Review!]
+#}
 
 type HomeItem {
     id: ID!

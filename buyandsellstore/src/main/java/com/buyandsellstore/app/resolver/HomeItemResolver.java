@@ -43,7 +43,7 @@ public class HomeItemResolver {
                                                  @Argument String type) {
 
         // Check if seller already uploaded a home item
-        HomeItem existingItem = homeItemService.findBySellerId(sellerId);
+        HomeItem existingItem = homeItemService.findByTitleAndSellerId(title, sellerId);
         if (existingItem != null) {
             return new UploadHomeItemResponse(false, "Seller has already uploaded an item. Duplicate uploads are not allowed.", null);
         }
@@ -68,5 +68,10 @@ public class HomeItemResolver {
     @QueryMapping
     public HomeItem homeItem(@Argument String id) {
         return homeItemService.getHomeItemById(id);
+    }
+
+    @QueryMapping
+    public List<HomeItem> getHomeItemsBySellerId(@Argument String sellerId) {
+        return homeItemService.findBySellerId(sellerId);
     }
 }

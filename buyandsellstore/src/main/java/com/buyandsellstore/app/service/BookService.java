@@ -24,7 +24,7 @@ public class BookService {
     }
 
     public Book findByTitleAndSellerId(String title, String sellerId) {
-        return bookRepository.findByTitleAndSellerId( title,  sellerId);
+        return bookRepository.findByTitleAndSellerId(title,  sellerId);
     }
 
     // Add a review to a book
@@ -69,5 +69,9 @@ public class BookService {
 
     public Book save(Book book){
         return bookRepository.save(book);
+    }
+
+    public List<Book> getBooksBySellerID(String sellerId){
+        return bookRepository.findBySellerId(sellerId);
     }
 }

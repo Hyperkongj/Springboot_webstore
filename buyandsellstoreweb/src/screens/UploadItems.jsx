@@ -77,14 +77,26 @@ const ManageInventory = () => {
     totalQuantity: "",
     imageUrl: "",
     description: "",
-    type: "",
+    type: "books", 
     subcategory: "",
     manufacturer: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => {
+      const updatedForm = { ...prev, [name]: value };
+      // Conditionally update other fields based on the 'type' dropdown
+      if (name === "type") {
+        if (value === "books") {
+          updatedForm.manufacturer = "";
+        } else if (value === "home") {
+          updatedForm.author = "";
+        }
+        updatedForm.subcategory = ""; // Reset subcategory when type changes
+      }
+      return updatedForm;
+    });
   };
 
   const handleSubmit = async (e) => {
