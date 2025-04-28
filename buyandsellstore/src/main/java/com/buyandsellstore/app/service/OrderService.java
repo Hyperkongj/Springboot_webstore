@@ -14,9 +14,9 @@ import com.buyandsellstore.app.dto.SellerStats;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.ArrayList;
+import java.util.Collections;
+
 import com.buyandsellstore.app.model.Book;
-
-
 
 import java.util.Date;
 import java.util.List;
@@ -65,7 +65,7 @@ public class OrderService {
     private CartService cartService;
 
     public OrderResponse createOrder(String userId, List<CartItem> items, float totalPrice,
-                                     Address billing, Address shipping, Payment payment) {
+            Address billing, Address shipping, Payment payment) {
         try {
             // Create a processed list with sellerIds injected
             List<CartItem> processedItems = new java.util.ArrayList<>();
@@ -104,13 +104,22 @@ public class OrderService {
         }
     }
 
+    // public List<Order> getOrdersByUserId(String userId) {
+    // List<Order> orderList = orderRepository.findByUserId(userId);
+    // if (orderList.isEmpty()) {
+    // return null;
+    // }else {
+    // return orderList;
+    // }
+    // }
 
     public List<Order> getOrdersByUserId(String userId) {
-        List<Order> orderList = orderRepository.findByUserId(userId);
-        if (orderList.isEmpty()) {
-            return null;
-        }else {
-            return orderList;
+        try {
+            List<Order> orderList = orderRepository.findByUserId(userId);
+            return orderList.isEmpty() ? Collections.emptyList() : orderList;
+        } catch (Exception e) {
+            // log the error
+            throw new RuntimeException("Error fetching orders for user ID: " + userId, e);
         }
     }
 

@@ -35,7 +35,8 @@ const ProfileScreen = () => {
   const [primaryShippingIndex, setPrimaryShippingIndex] = useState(null);
   const [primaryBillingIndex, setPrimaryBillingIndex] = useState(null);
 
-
+  // Add State for Previous Order
+  const [previousOrders, setPreviousOrders] = useState([]);
 
 
   // Initialize form data when user is available
@@ -65,6 +66,8 @@ const ProfileScreen = () => {
         const fullUrl = `${API_BASE_URL}${user.profilePictureUrl}`;
         setProfilePicPreview(fullUrl);
       }
+      // Fetch previous orders when the user is available
+      fetchPreviousOrders(user.id);
     }
   }, [user]);
 
@@ -432,6 +435,48 @@ const updateBillingAddresses = async (addressesParam) => {
     }
   };
 
+
+
+  // Fetch Previous Orders Function
+  const fetchPreviousOrders = async (userId) => {
+    setLoading(true);
+    const query = `
+      query GetPreviousOrders($userId: ID!) {
+        getOrdersByUserId(userId: $userId) {
+          id
+          totalPrice
+          createdAt
+          items {
+            name
+            quantity
+            price
+          }
+        }
+      }
+    `;
+    
+    const variables = { userId };
+    try {
+      const response = await fetch(GRAPHQL_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query, variables }),
+      });
+      const json = await response.json();
+      if (json.data && json.data.getOrdersByUserId) {
+        setPreviousOrders(json.data.getOrdersByUserId);
+      } else {
+        alert("Failed to fetch previous orders.");
+      }
+    } catch (error) {
+      console.error("Error fetching previous orders:", error);
+      alert("An error occurred while fetching previous orders.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
   return (
     <div style={styles.container}>
       <h2>My Profile</h2>
@@ -501,6 +546,37 @@ const updateBillingAddresses = async (addressesParam) => {
   )}
 </div>
 
+{/* Previous Orders */}
+<div style={styles.formGroup}>
+  <label>Previous Orders:</label>
+  {loading ? (
+    <div>Loading previous orders...</div>
+  ) : previousOrders.length > 0 ? (
+    previousOrders.map((order, idx) => (
+      <div key={idx} style={styles.orderItem}>
+        <h4>Order #{order.id}</h4>
+        <div>
+          <strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}
+        </div>
+        <div>
+          <strong>Total Price:</strong> ${order.totalPrice.toFixed(2)}
+        </div>
+        <div>
+          <strong>Items:</strong>
+          <ul>
+            {order.items.map((item, index) => (
+              <li key={index}>
+                {item.name} - {item.quantity} x ${item.price.toFixed(2)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    ))
+  ) : (
+    <div>No previous orders found.</div>
+  )}
+</div>
 
           {/* Shipping Addresses */}
           <div style={styles.formGroup}>
@@ -736,6 +812,9 @@ const updateBillingAddresses = async (addressesParam) => {
     </div>
   );
 };
+
+
+
 
 const styles = {
   container: { padding: "20px", maxWidth: "800px", margin: "0 auto" },
