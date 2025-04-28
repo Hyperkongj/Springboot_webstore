@@ -1,10 +1,7 @@
 package com.buyandsellstore.app.resolver;
 
 import com.buyandsellstore.app.dto.OrderResponse;
-import com.buyandsellstore.app.model.Address;
-import com.buyandsellstore.app.model.CartItem;
-import com.buyandsellstore.app.model.Order;
-import com.buyandsellstore.app.model.Payment;
+import com.buyandsellstore.app.model.*;
 import com.buyandsellstore.app.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -35,6 +32,11 @@ public class OrderResolver {
     @QueryMapping
     public List<Order> getOrdersByUserId(@Argument String userId){
         return orderService.getOrdersByUserId(userId);
+    }
+
+    @QueryMapping
+    public List<SoldItem> getSoldItemsBySellerId(@Argument String sellerId){
+        return orderService.getSoldItemsBySellerId(sellerId);
     }
 
 }

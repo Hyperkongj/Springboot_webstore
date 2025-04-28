@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { useUserContext } from '../context/UserContext';
 import '../styles/Inventory.css';
 
-// Book Query
+// Queries
 const GET_BOOKS_BY_SELLER = gql`
   query GetBooksBySellerId($sellerId: String!) {
     getBooksBySellerId(sellerId: $sellerId) {
@@ -26,7 +26,6 @@ const GET_BOOKS_BY_SELLER = gql`
   }
 `;
 
-// HomeItem Query
 const GET_HOME_ITEMS_BY_SELLER = gql`
   query GetHomeItemsBySellerId($sellerId: String!) {
     getHomeItemsBySellerId(sellerId: $sellerId) {
@@ -53,15 +52,24 @@ const Inventory = () => {
   const { user } = useUserContext();
   const sellerId = user?.id;
 
-  const { loading: loadingBooks, error: errorBooks, data: dataBooks } = useQuery(GET_BOOKS_BY_SELLER, {
+  const { loading: loadingBooks, error: errorBooks, data: dataBooks, refetch: refetchBooks } = useQuery(GET_BOOKS_BY_SELLER, {
     variables: { sellerId },
     skip: !sellerId,
+    fetchPolicy: "network-only", // always fetch fresh
   });
 
-  const { loading: loadingHomeItems, error: errorHomeItems, data: dataHomeItems } = useQuery(GET_HOME_ITEMS_BY_SELLER, {
+  const { loading: loadingHomeItems, error: errorHomeItems, data: dataHomeItems, refetch: refetchHomeItems } = useQuery(GET_HOME_ITEMS_BY_SELLER, {
     variables: { sellerId },
     skip: !sellerId,
+    fetchPolicy: "network-only",
   });
+
+  useEffect(() => {
+    if (sellerId) {
+      refetchBooks();
+      refetchHomeItems();
+    }
+  }, [sellerId, refetchBooks, refetchHomeItems]);
 
   if (!sellerId) {
     return <p>Loading user information...</p>;

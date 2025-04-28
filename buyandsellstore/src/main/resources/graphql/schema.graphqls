@@ -93,6 +93,7 @@ type Query {
     homeItem(id: ID!): HomeItem
     getBooksBySellerId(sellerId: String!): [Book!]!
     getHomeItemsBySellerId(sellerId: String!): [HomeItem!]!
+    getSoldItemsBySellerId(sellerId: String!): [SoldItem!]!
 }
 
 
@@ -250,6 +251,18 @@ type CartItem {
     price: Float
     imageUrl: String
 }
+
+type SoldItem {
+    itemId: ID!
+    type: String!
+    name: String
+    quantity: Int!
+    price: Float!
+    imageUrl: String
+    sellerId: String
+    createdAt: String
+}
+
 
 type Review {
     reviewer: String!
