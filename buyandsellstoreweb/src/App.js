@@ -39,6 +39,7 @@ import UploadItems from "./screens/UploadItems";
 import ProfileScreen from "./screens/ProfileScreen";
 import ManageInventory from "./screens/ManageInventory";
 import Inventory from "./screens/Inventory"; // or "./components/Inventory" if it's under components
+import Revenue from "./screens/Revenue";
 
 // Strip __typename before sending variables
 const cleanTypenameLink = new ApolloLink((operation, forward) => {
@@ -97,6 +98,7 @@ const AppRoutes = () => (
       <Route path="/seller-dashboard" element={<SellerDashboard />} />
       <Route path="/manageinventory" element={<ManageInventory />} />
       <Route path="/uploadItems" element={<UploadItems />} />
+      <Route path="/revenue" element={<Revenue />} />
 
       {/* Protected */}
       <Route
