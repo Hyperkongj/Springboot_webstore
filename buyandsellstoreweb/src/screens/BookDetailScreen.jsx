@@ -6,7 +6,7 @@ import { useUserContext } from "../context/UserContext";
 
 const API_BASE_URL = "http://localhost:8080";
 
-// Existing query to fetch book details
+// GraphQL queries and mutations remain the same...
 const GET_BOOK_DETAILS = gql`
   query GetBookDetails($id: ID!) {
     book(id: $id) {
@@ -25,7 +25,7 @@ const GET_BOOK_DETAILS = gql`
   }
 `;
 
-// Existing mutation for adding to cart
+// All other GraphQL definitions remain unchanged
 const ADD_TO_CART = gql`
   mutation AddToCart($userId: ID!, $itemId: ID!, $type: String!) {
     addToCart(userId: $userId, itemId: $itemId, type: $type) {
@@ -35,7 +35,6 @@ const ADD_TO_CART = gql`
   }
 `;
 
-// Existing mutation for removing from cart
 const REMOVE_FROM_CART = gql`
   mutation RemoveFromCart($userId: ID!, $itemId: ID!, $type: String!) {
     removeFromCart(userId: $userId, itemId: $itemId, type: $type) {
@@ -45,7 +44,6 @@ const REMOVE_FROM_CART = gql`
   }
 `;
 
-// Existing query for viewing cart items
 const VIEW_CART = gql`
   query GetCartItems($userId: ID!) {
     cartItems(id: $userId) {
@@ -59,7 +57,6 @@ const VIEW_CART = gql`
   }
 `;
 
-// New mutation for adding a wishlist item
 const ADD_WISHLIST_ITEM = gql`
   mutation AddWishlistItem($input: WishlistItemInput!) {
     addWishlistItem(input: $input) {
@@ -73,7 +70,6 @@ const ADD_WISHLIST_ITEM = gql`
   }
 `;
 
-// New query to read wishlist items from cache (used for updating the cache)
 const GET_WISHLIST_ITEMS = gql`
   query wishlistItems($userId: ID!) {
     wishlistItems(userId: $userId) {
@@ -136,32 +132,27 @@ const Book = () => {
 
   const book = data?.book;
 
-
   const { data: cartData, refetch: refetchCart } = useQuery(VIEW_CART, {
-    variables: { userId: user?.id || "placeholder-id" }, // ✅ always runs
+    variables: { userId: user?.id || "placeholder-id" },
   });
     
-  //Mutations
+  // Mutations
   const [addToCart, { loading: addLoading }] = useMutation(ADD_TO_CART);
   const [removeFromCart, { loading: removeLoading }] = useMutation(REMOVE_FROM_CART);
   const [addReview] = useMutation(ADD_REVIEW);
   const [updateReview] = useMutation(UPDATE_REVIEW);
   const [deleteReview] = useMutation(DELETE_REVIEW);
 
-
-  // Updated mutation for adding to wishlist with cache update logic
   const [addWishlistItem, { loading: wishlistLoading }] = useMutation(
     ADD_WISHLIST_ITEM,
     {
       update(cache, { data: { addWishlistItem } }) {
         try {
-          // Read the current wishlist from the cache for the logged-in user
           const existing = cache.readQuery({
             query: GET_WISHLIST_ITEMS,
             variables: { userId: user.id },
           });
           if (existing && existing.wishlistItems) {
-            // Write back the new wishlist array including the new item
             cache.writeQuery({
               query: GET_WISHLIST_ITEMS,
               variables: { userId: user.id },
@@ -171,35 +162,59 @@ const Book = () => {
             });
           }
         } catch (e) {
-          // If the cache is empty or the query hasn't been run yet,
-          // no update is needed.
           console.warn("Cache update skipped:", e);
         }
       },
       onCompleted() {
         setWishlistMessage("Book added to wishlist!");
+        setTimeout(() => setWishlistMessage(""), 3000);
       },
       onError(err) {
         console.error("Wishlist error:", err);
         setWishlistMessage("Failed to add book to wishlist.");
+        setTimeout(() => setWishlistMessage(""), 3000);
       },
     }
   );
 
-  //Hooks
+  // State hooks
   const [cartMessage, setCartMessage] = useState("");
   const [wishlistMessage, setWishlistMessage] = useState("");
   const [cartQuantity, setCartQuantity] = useState(0);
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState("");
   const [reviewMessage, setReviewMessage] = useState("");
-const existingReview = book?.reviews.find((r) => r.reviewer === user?.username);
+  const [activeTab, setActiveTab] = useState("description");
+  
+  const existingReview = book?.reviews.find((r) => r.reviewer === user?.username);
+  
   useEffect(() => {
     if (cartData) {
       const bookInCart = cartData.cartItems.find((item) => item.itemId === id);
       setCartQuantity(bookInCart ? bookInCart.quantity : 0);
     }
   }, [cartData, id]);
+
+  useEffect(() => {
+    if (existingReview) {
+      setComment(existingReview.comment);
+      setRating(existingReview.rating.toString());
+    }
+  }, [existingReview]);
+
+  useEffect(() => {
+    if (cartMessage) {
+      const timer = setTimeout(() => setCartMessage(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [cartMessage]);
+
+  useEffect(() => {
+    if (reviewMessage) {
+      const timer = setTimeout(() => setReviewMessage(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [reviewMessage]);
 
   const handleAddToCart = async () => {
     if (!user || !user.id) {
@@ -239,10 +254,6 @@ const existingReview = book?.reviews.find((r) => r.reviewer === user?.username);
     }
   };
 
-  //if (loading) return <p>Loading book details...</p>;
-  //if (error) return <p>Error loading book details: {error.message}</p>;
-
-  // Handler for adding a book to the wishlist
   const handleAddToWishlist = async () => {
     if (!user || !user.id) {
       setWishlistMessage("Please log in to add items to the wishlist.");
@@ -297,243 +308,624 @@ const existingReview = book?.reviews.find((r) => r.reviewer === user?.username);
       console.error(err);
     }
   };
+
+  const renderStars = (rating) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        stars.push(<span key={i} style={styles.starFilled}>★</span>);
+      } else if (i === fullStars && hasHalfStar) {
+        stars.push(<span key={i} style={styles.starHalf}>★</span>);
+      } else {
+        stars.push(<span key={i} style={styles.starEmpty}>☆</span>);
+      }
+    }
+    
+    return stars;
+  };
+
+  if (loading) return (
+    <div style={styles.loadingContainer}>
+      <div style={styles.loadingSpinner}></div>
+      <p>Loading book details...</p>
+    </div>
+  );
   
-
-
-  //if (loading) return <p>Loading book details...</p>;
-  //if (error) return <p>Error loading book details: {error.message}</p>;
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
-  if (!book) return <p>Book not found.</p>;
+  if (error) return (
+    <div style={styles.errorContainer}>
+      <h2>Error</h2>
+      <p>{error.message}</p>
+    </div>
+  );
+  
+  if (!book) return (
+    <div style={styles.errorContainer}>
+      <h2>Not Found</h2>
+      <p>Book not found.</p>
+    </div>
+  );
 
   return (
     <div style={styles.container}>
       <div style={styles.bookDetails}>
-        <img
-          src={`${book.imageUrl}`}
-          alt={book.title}
-          style={styles.bookImage}
-        />
+        <div style={styles.imageContainer}>
+          <img
+            src={`${book.imageUrl}`}
+            alt={book.title}
+            style={styles.bookImage}
+          />
+        </div>
         <div style={styles.bookInfo}>
-          <h1>{book.title}</h1>
-          <p>
-            <strong>Author:</strong> {book.author}
-          </p>
-          <p>
-            <strong>Price:</strong> ${book.price.toFixed(2)}
-          </p>
-          <p>
-            <strong>Ratings:</strong> {book.ratings.toFixed(1)} / 5
-          </p>
-          <div style={styles.cartButtons}>
-            <button
-              onClick={handleRemoveFromCart}
-              style={styles.cartButton}
-              disabled={removeLoading}
-            >
-              {removeLoading ? "Removing..." : "-"}
-            </button>
-            <span style={styles.cartQuantity}>{cartQuantity}</span>
-            <button
-              onClick={handleAddToCart}
-              style={styles.cartButton}
-              disabled={addLoading}
-            >
-              {addLoading ? "Adding..." : "+"}
-            </button>
+          <h1 style={styles.bookTitle}>{book.title}</h1>
+          <p style={styles.authorName}>By {book.author}</p>
+          
+          <div style={styles.ratingContainer}>
+            <div style={styles.stars}>
+              {renderStars(book.ratings)}
+            </div>
+            <span style={styles.ratingText}>
+              {book.ratings.toFixed(1)} ({book.reviews.length} {book.reviews.length === 1 ? 'review' : 'reviews'})
+            </span>
           </div>
-          {cartMessage && <p style={styles.cartMessage}>{cartMessage}</p>}
-          <div style={styles.wishlistSection}>
+          
+          <div style={styles.priceSection}>
+            <span style={styles.price}>${book.price.toFixed(2)}</span>
+          </div>
+          
+          <div style={styles.actionButtons}>
+            <div style={styles.cartActions}>
+              <div style={styles.cartQuantityControl}>
+                <button
+                  onClick={handleRemoveFromCart}
+                  style={cartQuantity > 0 ? styles.quantityButton : styles.quantityButtonDisabled}
+                  disabled={removeLoading || cartQuantity === 0}
+                >
+                  {removeLoading ? "..." : "-"}
+                </button>
+                <span style={styles.cartQuantity}>{cartQuantity}</span>
+                <button
+                  onClick={handleAddToCart}
+                  style={styles.quantityButton}
+                  disabled={addLoading}
+                >
+                  {addLoading ? "..." : "+"}
+                </button>
+              </div>
+              <button
+                onClick={handleAddToCart}
+                style={styles.addToCartButton}
+                disabled={addLoading}
+              >
+                {addLoading ? "Adding..." : cartQuantity > 0 ? "Add More to Cart" : "Add to Cart"}
+              </button>
+            </div>
+            
             <button
               onClick={handleAddToWishlist}
               style={styles.wishlistButton}
               disabled={wishlistLoading}
             >
-              {wishlistLoading ? "Adding..." : "Add to Wishlist"}
+              {wishlistLoading ? "Adding..." : "♡ Wishlist"}
             </button>
-            {wishlistMessage && (
-              <p style={styles.wishlistMessage}>{wishlistMessage}</p>
-            )}
           </div>
+          
+          {cartMessage && <div style={styles.messageBox}>{cartMessage}</div>}
+          {wishlistMessage && <div style={styles.messageBox}>{wishlistMessage}</div>}
         </div>
       </div>
-      <div style={styles.reviews}>
-        <h2>Reviews</h2>
-        {book.reviews.map((review, i) => (
-          <div key={i} style={styles.review}>
-            <p>
-              <strong>{review.reviewer}:</strong> {review.comment}
-            </p>
-            <p>
-              <strong>Rating:</strong> {review.rating} / 5
-            </p>
-          </div>
-        ))}
+      
+      <div style={styles.tabsContainer}>
+        <div style={styles.tabs}>
+          <button 
+            style={activeTab === "description" ? styles.activeTab : styles.tab}
+            onClick={() => setActiveTab("description")}
+          >
+            Description
+          </button>
+          <button 
+            style={activeTab === "reviews" ? styles.activeTab : styles.tab}
+            onClick={() => setActiveTab("reviews")}
+          >
+            Reviews ({book.reviews.length})
+          </button>
+        </div>
+        
+        <div style={styles.tabContent}>
+          {activeTab === "description" && (
+            <div style={styles.description}>
+              <p>
+                This is a fascinating book that will captivate readers with its engaging storyline and memorable characters.
+                {/* Note: You'd typically fetch this from your API */}
+              </p>
+            </div>
+          )}
+          
+          {activeTab === "reviews" && (
+            <div style={styles.reviewsContainer}>
+              {book.reviews.length > 0 ? (
+                book.reviews.map((review, i) => (
+                  <div key={i} style={styles.reviewCard}>
+                    <div style={styles.reviewHeader}>
+                      <span style={styles.reviewerName}>{review.reviewer}</span>
+                      <div style={styles.reviewStars}>
+                        {renderStars(review.rating)}
+                      </div>
+                    </div>
+                    <p style={styles.reviewComment}>{review.comment}</p>
+                  </div>
+                ))
+              ) : (
+                <p style={styles.noReviews}>No reviews yet. Be the first to review this book!</p>
+              )}
+              
+              {user && (
+                <div style={styles.reviewFormContainer}>
+                  <h3 style={styles.reviewFormTitle}>
+                    {existingReview ? "Update Your Review" : "Write a Review"}
+                  </h3>
+                  
+                  <form onSubmit={handleSubmitReview} style={styles.reviewForm}>
+                    <div style={styles.ratingInputContainer}>
+                      <label style={styles.ratingLabel}>Your Rating:</label>
+                      <div style={styles.ratingInput}>
+                        <input
+                          type="number"
+                          min="0"
+                          max="5"
+                          step="0.1"
+                          value={rating}
+                          onChange={(e) => setRating(e.target.value)}
+                          placeholder="0.0 - 5.0"
+                          required
+                          style={styles.ratingField}
+                        />
+                        <span style={styles.ratingScale}>/ 5</span>
+                      </div>
+                    </div>
+                    
+                    <div style={styles.commentContainer}>
+                      <label style={styles.commentLabel}>Your Review:</label>
+                      <textarea
+                        placeholder="Share your thoughts about this book..."
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        required
+                        style={styles.commentField}
+                      />
+                    </div>
+                    
+                    <div style={styles.reviewButtonsContainer}>
+                      <button type="submit" style={styles.submitReviewButton}>
+                        {existingReview ? "Update Review" : "Submit Review"}
+                      </button>
+                      
+                      {existingReview && (
+                        <button
+                          type="button"
+                          onClick={handleDeleteReview}
+                          style={styles.deleteReviewButton}
+                        >
+                          Delete Review
+                        </button>
+                      )}
+                    </div>
+                  </form>
+                  
+                  {reviewMessage && (
+                    <div style={styles.reviewMessageBox}>{reviewMessage}</div>
+                  )}
+                </div>
+              )}
+              
+              {!user && (
+                <div style={styles.loginPrompt}>
+                  <p>Please log in to leave a review.</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-      {user && (
-        <form onSubmit={handleSubmitReview} style={styles.reviewForm}>
-  <h3 style={styles.reviewTitle}>
-    {existingReview ? "Update" : "Add"} Your Review
-  </h3>
-
-  <textarea
-    placeholder="Write a review"
-    value={comment}
-    onChange={(e) => setComment(e.target.value)}
-    required
-    style={styles.textarea}
-  />
-
-  <input
-    type="number"
-    min="0"
-    max="5"
-    step="0.1"
-    value={rating}
-    onChange={(e) => setRating(e.target.value)}
-    placeholder="Rating (0-5)"
-    required
-    style={styles.input}
-  />
-
-  <button type="submit" style={styles.submitButton}>
-    {existingReview ? "Update Review" : "Add Review"}
-  </button>
-
-  {existingReview && (
-    <button
-      type="button"
-      onClick={handleDeleteReview}
-      style={styles.deleteButton}
-    >
-      Delete Review
-    </button>
-  )}
-
-  {reviewMessage && <p style={styles.reviewMessage}>{reviewMessage}</p>}
-</form>
-
-      )}
     </div>
   );
 };
 
 const styles = {
-  container: { padding: "20px", fontFamily: "Arial, sans-serif" },
-  bookDetails: {
-    display: "flex",
-    gap: "20px",
-    flexWrap: "wrap",
-    marginBottom: "20px",
+  container: {
+    maxWidth: "1200px",
+    margin: "0 auto",
+    padding: "30px 20px",
+    fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif",
+    color: "#333",
+    backgroundColor: "#f9f9f9",
   },
-  bookImage: {
-    width: "200px",
-    height: "300px",
-    objectFit: "contain",
-  },
-  bookInfo: { maxWidth: "600px" },
-  cartButtons: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    marginTop: "10px",
-  },
-  cartQuantity: { fontSize: "18px", fontWeight: "bold" },
-  cartButton: {
-    padding: "10px 20px",
-    background: "#007BFF",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
-  cartMessage: { marginTop: "10px", color: "green" },
-  wishlistSection: { marginTop: "20px" },
-  wishlistButton: {
-    padding: "10px 20px",
-    background: "#28a745",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
-  wishlistMessage: { marginTop: "10px", color: "green" },
-  reviews: { marginTop: "20px" },
-  review: {
-    marginBottom: "15px",
-    padding: "10px",
-    border: "1px solid #ddd",
-    borderRadius: "5px",
-  },
-
-  reviewForm: {
-    marginTop: "30px",
-    padding: "20px",
-    backgroundColor: "#fff",
-    borderRadius: "10px",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+  
+  // Loading and error states
+  loadingContainer: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: "15px",
-    width: "100%",
-    maxWidth: "800px",
-    marginLeft: "auto",
-    marginRight: "auto",
+    justifyContent: "center",
+    height: "300px",
+  },
+  loadingSpinner: {
+    width: "40px",
+    height: "40px",
+    border: "4px solid rgba(0, 0, 0, 0.1)",
+    borderRadius: "50%",
+    borderTopColor: "#007BFF",
+    animation: "spin 1s ease-in-out infinite",
+    marginBottom: "15px",
+  },
+  errorContainer: {
+    padding: "20px",
+    backgroundColor: "#fff",
+    borderRadius: "8px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    textAlign: "center",
   },
   
-  reviewTitle: {
+  // Book details section
+  bookDetails: {
+    display: "flex",
+    gap: "40px",
+    flexWrap: "wrap",
+    backgroundColor: "#fff",
+    borderRadius: "12px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+    padding: "30px",
+    marginBottom: "30px",
+  },
+  imageContainer: {
+    flex: "0 0 280px",
+    display: "flex",
+    justifyContent: "center",
+  },
+  bookImage: {
+    width: "100%",
+    maxWidth: "280px",
+    height: "auto",
+    objectFit: "contain",
+    borderRadius: "8px",
+    boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+  },
+  bookInfo: {
+    flex: "1 1 400px",
+    display: "flex",
+    flexDirection: "column",
+  },
+  bookTitle: {
+    fontSize: "28px",
+    fontWeight: "700",
+    marginTop: "0",
+    marginBottom: "8px",
+    color: "#1a1a1a",
+  },
+  authorName: {
+    fontSize: "18px",
+    color: "#555",
+    marginTop: "0",
+    marginBottom: "20px",
+  },
+  
+  // Rating section
+  ratingContainer: {
+    display: "flex",
+    alignItems: "center",
+    marginBottom: "20px",
+  },
+  stars: {
+    display: "flex",
+    marginRight: "10px",
     fontSize: "20px",
+  },
+  starFilled: {
+    color: "#ffc107",
+  },
+  starHalf: {
+    color: "#ffc107",
+    position: "relative",
+  },
+  starEmpty: {
+    color: "#e4e5e9",
+  },
+  ratingText: {
+    fontSize: "16px",
+    color: "#666",
+  },
+  
+  // Price section
+  priceSection: {
+    marginBottom: "25px",
+  },
+  price: {
+    fontSize: "26px",
+    fontWeight: "700",
+    color: "#038552",
+  },
+  
+  // Action buttons
+  actionButtons: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
+    marginBottom: "20px",
+  },
+  cartActions: {
+    display: "flex",
+    alignItems: "center",
+    gap: "15px",
+    flexWrap: "wrap",
+  },
+  cartQuantityControl: {
+    display: "flex",
+    alignItems: "center",
+    border: "1px solid #ddd",
+    borderRadius: "6px",
+    overflow: "hidden",
+  },
+  quantityButton: {
+    width: "40px",
+    height: "40px",
+    border: "none",
+    background: "#f0f0f0",
+    fontSize: "18px",
     fontWeight: "bold",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  
-  textarea: {
-    width: "100%",
-    minHeight: "100px",
-    padding: "10px",
-    fontSize: "16px",
-    borderRadius: "8px",
-    border: "1px solid #ccc",
-    resize: "vertical",
+  quantityButtonDisabled: {
+    width: "40px",
+    height: "40px",
+    border: "none",
+    background: "#f0f0f0",
+    fontSize: "18px",
+    fontWeight: "bold",
+    cursor: "not-allowed",
+    color: "#aaa",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  
-  input: {
-    width: "150px",
-    padding: "10px",
-    fontSize: "16px",
-    borderRadius: "8px",
-    border: "1px solid #ccc",
+  cartQuantity: {
+    width: "50px",
+    height: "40px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "18px",
+    fontWeight: "bold",
+    borderLeft: "1px solid #ddd",
+    borderRight: "1px solid #ddd",
   },
-  
-  submitButton: {
-    padding: "12px 30px",
-    fontSize: "16px",
+  addToCartButton: {
+    flex: "1",
+    padding: "0 30px",
+    height: "45px",
     backgroundColor: "#007BFF",
     color: "#fff",
     border: "none",
-    borderRadius: "8px",
+    borderRadius: "6px",
+    fontSize: "16px",
+    fontWeight: "600",
     cursor: "pointer",
-    fontWeight: "bold",
-    transition: "background 0.3s",
+    transition: "background-color 0.2s",
+  },
+  wishlistButton: {
+    height: "45px",
+    backgroundColor: "#fff",
+    color: "#333",
+    border: "1px solid #ddd",
+    borderRadius: "6px",
+    fontSize: "16px",
+    fontWeight: "600",
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
+  messageBox: {
+    padding: "10px 15px",
+    backgroundColor: "#d4edda",
+    color: "#155724",
+    borderRadius: "6px",
+    fontSize: "14px",
+    marginTop: "15px",
+    animation: "fadeIn 0.3s ease-in-out",
   },
   
-  deleteButton: {
-    padding: "10px 20px",
-    backgroundColor: "#dc3545",
+  // Tabs section
+  tabsContainer: {
+    backgroundColor: "#fff",
+    borderRadius: "12px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+    overflow: "hidden",
+  },
+  tabs: {
+    display: "flex",
+    borderBottom: "1px solid #e0e0e0",
+  },
+  tab: {
+    padding: "15px 25px",
+    backgroundColor: "transparent",
+    border: "none",
+    borderBottom: "3px solid transparent",
+    fontSize: "16px",
+    fontWeight: "600",
+    color: "#666",
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
+  activeTab: {
+    padding: "15px 25px",
+    backgroundColor: "transparent",
+    border: "none",
+    borderBottom: "3px solid #007BFF",
+    fontSize: "16px",
+    fontWeight: "600",
+    color: "#007BFF",
+    cursor: "pointer",
+  },
+  tabContent: {
+    padding: "30px",
+  },
+  
+  // Description tab
+  description: {
+    fontSize: "16px",
+    lineHeight: "1.6",
+    color: "#333",
+  },
+  
+  // Reviews tab
+  reviewsContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "25px",
+  },
+  noReviews: {
+    fontSize: "16px",
+    color: "#666",
+    fontStyle: "italic",
+  },
+  reviewCard: {
+    padding: "20px",
+    backgroundColor: "#f9f9f9",
+    borderRadius: "8px",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+  },
+  reviewHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "10px",
+  },
+  reviewerName: {
+    fontWeight: "600",
+    fontSize: "16px",
+    color: "#444",
+  },
+  reviewStars: {
+    display: "flex",
+    fontSize: "16px",
+  },
+  reviewComment: {
+    margin: "0",
+    fontSize: "15px",
+    lineHeight: "1.5",
+  },
+  
+  // Review form
+  reviewFormContainer: {
+    marginTop: "10px",
+    padding: "25px",
+    backgroundColor: "#f9f9f9",
+    borderRadius: "8px",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+  },
+  reviewFormTitle: {
+    fontSize: "18px",
+    fontWeight: "600",
+    marginTop: "0",
+    marginBottom: "20px",
+    color: "#333",
+  },
+  reviewForm: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "20px",
+  },
+  ratingInputContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+  },
+  ratingLabel: {
+    fontSize: "15px",
+    fontWeight: "500",
+    color: "#444",
+  },
+  ratingInput: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  },
+  ratingField: {
+    width: "100px",
+    padding: "10px 12px",
+    fontSize: "16px",
+    border: "1px solid #ddd",
+    borderRadius: "6px",
+  },
+  ratingScale: {
+    color: "#666",
+    fontSize: "16px",
+  },
+  commentContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+  },
+  commentLabel: {
+    fontSize: "15px",
+    fontWeight: "500",
+    color: "#444",
+  },
+  commentField: {
+    width: "100%",
+    minHeight: "120px",
+    padding: "12px 15px",
+    fontSize: "16px",
+    border: "1px solid #ddd",
+    borderRadius: "6px",
+    resize: "vertical",
+    fontFamily: "inherit",
+  },
+  reviewButtonsContainer: {
+    display: "flex",
+    gap: "15px",
+    marginTop: "10px",
+  },
+  submitReviewButton: {
+    padding: "12px 25px",
+    backgroundColor: "#007BFF",
     color: "#fff",
     border: "none",
-    borderRadius: "8px",
+    borderRadius: "6px",
+    fontSize: "16px",
+    fontWeight: "600",
     cursor: "pointer",
-    fontWeight: "bold",
+    transition: "background-color 0.2s",
   },
-  
-  reviewMessage: {
-    marginTop: "10px",
-    color: "#28a745",
-    fontWeight: "bold",
+  deleteReviewButton: {
+    padding: "12px 25px",
+    backgroundColor: "#fff",
+    color: "#dc3545",
+    border: "1px solid #dc3545",
+    borderRadius: "6px",
+    fontSize: "16px",
+    fontWeight: "600",
+    cursor: "pointer",
+    transition: "all 0.2s",
   },
-  
+  reviewMessageBox: {
+    marginTop: "20px",
+    padding: "10px 15px",
+    backgroundColor: "#d4edda",
+    color: "#155724",
+    borderRadius: "6px",
+    fontSize: "14px",
+  },
+  loginPrompt: {
+    padding: "20px",
+    textAlign: "center",
+    backgroundColor: "#f8f9fa",
+    borderRadius: "8px",
+    border: "1px dashed #dee2e6",
+  },
 };
 
 export default Book;

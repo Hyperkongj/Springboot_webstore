@@ -9,8 +9,16 @@ import com.buyandsellstore.app.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.buyandsellstore.app.dto.SellerStats;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collections;
 
-import java.util.*;
+import com.buyandsellstore.app.model.Book;
+
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class OrderService {
@@ -58,7 +66,7 @@ public class OrderService {
     private CartService cartService;
 
     public OrderResponse createOrder(String userId, List<CartItem> items, float totalPrice,
-                                     Address billing, Address shipping, Payment payment) {
+            Address billing, Address shipping, Payment payment) {
         try {
             // Create a processed list with sellerIds injected
             List<CartItem> processedItems = new java.util.ArrayList<>();
@@ -102,13 +110,22 @@ public class OrderService {
         }
     }
 
+    // public List<Order> getOrdersByUserId(String userId) {
+    // List<Order> orderList = orderRepository.findByUserId(userId);
+    // if (orderList.isEmpty()) {
+    // return null;
+    // }else {
+    // return orderList;
+    // }
+    // }
 
     public List<Order> getOrdersByUserId(String userId) {
-        List<Order> orderList = orderRepository.findByUserId(userId);
-        if (orderList.isEmpty()) {
-            return null;
-        }else {
-            return orderList;
+        try {
+            List<Order> orderList = orderRepository.findByUserId(userId);
+            return orderList.isEmpty() ? Collections.emptyList() : orderList;
+        } catch (Exception e) {
+            // log the error
+            throw new RuntimeException("Error fetching orders for user ID: " + userId, e);
         }
     }
 
@@ -116,8 +133,7 @@ public class OrderService {
         return orderRepository.removeByUserId(userId);
     }
 
-
-    public List<SoldItem> getSoldItemsBySellerId(String sellerId){
+    public List<SoldItem> getSoldItemsBySellerId(String sellerId) {
         List<Order> allOrders = orderRepository.findAll();
         List<SoldItem> soldItems = new ArrayList<>();
         for (Order order : allOrders) {
