@@ -26,6 +26,7 @@ import ForgotPassword from "./screens/ForgotPasswordScreen";
 import ResetPassword from "./screens/ResetPasswordScreen";
 import HomeScreen from "./screens/HomeScreen";
 import HomeItemsScreen from "./screens/HomeItemsScreen";
+import HomeItem from "./screens/HomeItem";
 import Header from "./components/Header";
 import CartScreen from "./screens/CartScreen";
 import Books from "./screens/BooksScreen";
@@ -34,8 +35,11 @@ import CheckoutScreen from "./screens/CheckoutScreen";
 import WishlistScreen from "./screens/WishlistScreen";
 import SellerDashboard from "./screens/SellerDashboard";
 import SellerHome from "./screens/SellerHome";
-import ManageInventory from "./screens/ManageInventory";
+import UploadItems from "./screens/UploadItems";
 import ProfileScreen from "./screens/ProfileScreen";
+import ManageInventory from "./screens/ManageInventory";
+import Inventory from "./screens/Inventory"; // or "./components/Inventory" if it's under components
+import Revenue from "./screens/Revenue";
 
 // Strip __typename before sending variables
 const cleanTypenameLink = new ApolloLink((operation, forward) => {
@@ -93,6 +97,8 @@ const AppRoutes = () => (
       {/* Seller Public */}
       <Route path="/seller-dashboard" element={<SellerDashboard />} />
       <Route path="/manageinventory" element={<ManageInventory />} />
+      <Route path="/uploadItems" element={<UploadItems />} />
+      <Route path="/revenue" element={<Revenue />} />
 
       {/* Protected */}
       <Route
@@ -167,9 +173,18 @@ const AppRoutes = () => (
           </ProtectedRoute>
         }
       />
+      <Route path="/home-item/:id" element={<HomeItem />} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/home" replace />} />
+      <Route
+        path="/inventory"
+        element={
+          <ProtectedRoute>
+            <Inventory />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   </Layout>
 );

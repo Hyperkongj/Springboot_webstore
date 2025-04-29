@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../context/UserContext";
@@ -47,7 +47,7 @@ const CartScreen = () => {
 
   const [addToCart] = useMutation(ADD_TO_CART);
   const [removeFromCart] = useMutation(REMOVE_FROM_CART);
-
+  const [cartMessages, setCartMessages] = useState({});
   useEffect(() => {
     if (userId) {
       refetch();
@@ -65,31 +65,33 @@ const CartScreen = () => {
 
   const handleAddToCart = async (itemId, type) => {
     try {
-      await addToCart({
-        variables: {
-          userId,
-          itemId,
-          type,
-        },
+      const response = await addToCart({
+        variables: { userId, itemId, type },
       });
+      const message = response.data.addToCart.message || "Item added to cart!";
+      setCartMessages((prev) => ({ ...prev, [itemId]: message }));
       refetch();
     } catch (err) {
       console.error("Error adding item to cart:", err.message);
+      setCartMessages((prev) => ({ ...prev, [itemId]: "Failed to add item." }));
     }
   };
 
   const handleRemoveFromCart = async (itemId, type) => {
     try {
-      await removeFromCart({
-        variables: {
-          userId,
-          itemId,
-          type,
-        },
+      const response = await removeFromCart({
+        variables: { userId, itemId, type },
       });
+      const message =
+        response.data.removeFromCart.message || "Item removed from cart!";
+      setCartMessages((prev) => ({ ...prev, [itemId]: message }));
       refetch();
     } catch (err) {
       console.error("Error removing item from cart:", err.message);
+      setCartMessages((prev) => ({
+        ...prev,
+        [itemId]: "Failed to remove item.",
+      }));
     }
   };
 
@@ -122,6 +124,17 @@ const CartScreen = () => {
                       <p>Quantity: {item.quantity}</p>
                       <p>Price: ${item.price.toFixed(2)}</p>
                       <p>Total: ${(item.price * item.quantity).toFixed(2)}</p>
+                      {cartMessages[item.itemId] && (
+                        <p
+                          style={{
+                            color: "green",
+                            fontWeight: "bold",
+                            marginTop: "8px",
+                          }}
+                        >
+                          {cartMessages[item.itemId]}
+                        </p>
+                      )}
                       <div style={styles.cartButtons}>
                         <button
                           onClick={() =>

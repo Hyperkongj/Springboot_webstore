@@ -1,11 +1,9 @@
 package com.buyandsellstore.app.service;
 
 import com.buyandsellstore.app.dto.OrderResponse;
-import com.buyandsellstore.app.model.Address;
-import com.buyandsellstore.app.model.CartItem;
-import com.buyandsellstore.app.model.Order;
-import com.buyandsellstore.app.model.Payment;
+import com.buyandsellstore.app.model.*;
 import com.buyandsellstore.app.repository.CartRepository;
+import com.buyandsellstore.app.repository.HomeItemRepository;
 import com.buyandsellstore.app.repository.OrderRepository;
 import com.buyandsellstore.app.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +60,9 @@ public class OrderService {
     private BookRepository bookRepository; // Needed to look up sellerId from books
 
     @Autowired
+    private HomeItemRepository homeItemRepository; // Needed to look up sellerId from books
+
+    @Autowired
     private CartService cartService;
 
     public OrderResponse createOrder(String userId, List<CartItem> items, float totalPrice,
@@ -76,8 +77,13 @@ public class OrderService {
                         item.setSellerId(book.getSellerId());
                         processedItems.add(item);
                     });
+                } else if ("home".equalsIgnoreCase(item.getType())) {
+                    homeItemRepository.findById(item.getItemId()).ifPresent(homeItem -> {
+                        item.setSellerId(homeItem.getSellerId());
+                        processedItems.add(item);
+                    });
                 } else {
-                    // If not a book (e.g., home item), just ad d it
+                    // If not book or home, still add it (optional fallback)
                     processedItems.add(item);
                 }
             }
@@ -125,5 +131,28 @@ public class OrderService {
 
     public long removeOrderByUserId(String userId) {
         return orderRepository.removeByUserId(userId);
+    }
+
+    public List<SoldItem> getSoldItemsBySellerId(String sellerId) {
+        List<Order> allOrders = orderRepository.findAll();
+        List<SoldItem> soldItems = new ArrayList<>();
+        for (Order order : allOrders) {
+            for (CartItem item : order.getItems()) {
+                if (sellerId.equals(item.getSellerId())) {
+                    SoldItem soldItem = new SoldItem(
+                            item.getItemId(),
+                            item.getType(),
+                            item.getName(),
+                            item.getQuantity(),
+                            item.getPrice(),
+                            item.getImageUrl(),
+                            item.getSellerId(),
+                            order.getCreatedAt() // from the Order's createdAt
+                    );
+                    soldItems.add(soldItem); // ✅ Add every matching item separately
+                }
+            }
+        }
+        return soldItems;
     }
 }

@@ -1,5 +1,6 @@
 package com.buyandsellstore.app.resolver;
 
+import com.buyandsellstore.app.dto.UploadBookResponse;
 import com.buyandsellstore.app.model.Book;
 import com.buyandsellstore.app.repository.BookRepository;
 import com.buyandsellstore.app.model.Review;
@@ -30,6 +31,11 @@ public class BookResolver {
         return bookService.getBookById(id);
     }
 
+    @QueryMapping
+    public List<Book> getBooksBySellerId(@Argument String sellerId) {
+        return bookService.getBooksBySellerID(sellerId);
+    }
+
     // Mutations for Reviews
 
     @MutationMapping
@@ -47,10 +53,19 @@ public class BookResolver {
         return bookService.deleteReview(bookId, reviewer);
     }
 
+    /*this method is only used by user of type seller
+    i.e. if isSeller flag for the user is true
+    */
     @MutationMapping
-    public Book uploadBook(@Argument String title, @Argument String author, @Argument int totalQuantity, @Argument double price, @Argument String imageUrl, @Argument String description, @Argument String sellerId) {
+    public UploadBookResponse uploadBook(@Argument String title, @Argument String author, @Argument int totalQuantity, @Argument double price, @Argument String imageUrl, @Argument String description, @Argument String sellerId) {
+
+        Book existingBook = bookService.findByTitleAndSellerId(title, sellerId);
+        if (existingBook != null) {
+            return new UploadBookResponse(false, "This book already exists for the seller. Duplicate uploads are not allowed.", null);
+        }
+
         Book book = new Book(title, author, price, imageUrl, description, sellerId, totalQuantity);
         book.setReviews(new ArrayList<>());
-        return bookService.save(book);
+        return new UploadBookResponse(true, "Upload successful!", bookService.save(book));
     }
 }
