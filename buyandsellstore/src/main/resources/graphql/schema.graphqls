@@ -191,6 +191,46 @@ type Review {
   rating: Float!
 }
 
+# --- ANALYTICS TYPES ---
+
+type SellerStats {
+  totalBuyers: Int!
+  totalPurchases: Int!
+  totalRevenue: Float!
+  purchasedBooks: [Book!]!
+}
+
+type SellerAnalytics {
+  totalBuyers: Int!
+  totalPurchases: Int!
+  totalRevenue: Float!
+  averageOrderValue: Float!
+}
+
+type TopProduct {
+  id: ID!
+  name: String!
+  type: String!
+  quantity: Int!
+  revenue: Float!
+  imageUrl: String
+}
+
+type CategoryMetric {
+  name: String!
+  count: Int!
+  revenue: Float!
+}
+
+type CategorySales {
+  categories: [CategoryMetric!]!
+}
+
+type TimeSeriesData {
+  timeLabels: [String!]!
+  revenueValues: [Float!]!
+}
+
 # --- QUERIES ---
 
 type Query {
@@ -215,6 +255,13 @@ type Query {
   wishlistItems(userId: ID!): [WishlistItem!]!
   wishlistItem(id: ID!): WishlistItem
   wishlistCount(userId: ID!): Int!
+  
+  # Seller Analytics
+  getSellerStatistics(sellerId: ID!): SellerStats!
+  getSellerSalesAnalytics(sellerId: ID!, timeFrame: String): SellerAnalytics!
+  getTopSellingProducts(sellerId: ID!, timeFrame: String, metric: String, limit: Int): [TopProduct!]!
+  getSalesByCategory(sellerId: ID!, timeFrame: String): CategorySales!
+  getRevenueOverTime(sellerId: ID!, timeFrame: String, groupBy: String): TimeSeriesData!
 }
 
 # --- MUTATIONS ---
