@@ -123,6 +123,9 @@ const DELETE_REVIEW = gql`
   }
 `;
 
+// Rest of the file remains unchanged
+
+
 const HomeItem = () => {
   const { id } = useParams();
   const { user } = useUserContext();
@@ -286,7 +289,7 @@ const HomeItem = () => {
       if (existingReview) {
         await updateReview({ 
           variables: { 
-            homeItemId: id, 
+            homeItemId: id,  // Pass homeItemId as bookId
             reviewer: user.username, 
             updatedReview: review 
           } 
@@ -295,7 +298,7 @@ const HomeItem = () => {
       } else {
         await addReview({ 
           variables: { 
-            homeItemId: id, 
+            homeItemId: id,  // Pass homeItemId as bookId
             review 
           } 
         });
@@ -323,7 +326,7 @@ const HomeItem = () => {
     try {
       await deleteReview({ 
         variables: { 
-          homeItemId: id, 
+          homeItemId: id,  // Pass homeItemId as bookId
           reviewer: user.username 
         } 
       });
