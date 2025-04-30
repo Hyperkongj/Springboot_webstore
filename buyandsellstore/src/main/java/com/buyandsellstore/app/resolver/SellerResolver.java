@@ -3,9 +3,14 @@ package com.buyandsellstore.app.resolver;
 import com.buyandsellstore.app.dto.SellerStats;
 import com.buyandsellstore.app.model.Book;
 import com.buyandsellstore.app.model.CartItem;
+import com.buyandsellstore.app.model.HomeItem;
 import com.buyandsellstore.app.model.Order;
+import com.buyandsellstore.app.model.SoldItem;
 import com.buyandsellstore.app.repository.BookRepository;
+import com.buyandsellstore.app.repository.HomeItemRepository;
 import com.buyandsellstore.app.repository.OrderRepository;
+import com.buyandsellstore.app.service.SellerAnalyticsService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -21,6 +26,12 @@ public class SellerResolver {
 
     @Autowired
     private BookRepository bookRepository;
+    
+    @Autowired
+    private HomeItemRepository homeItemRepository;
+    
+    @Autowired
+    private SellerAnalyticsService sellerAnalyticsService;
 
     @QueryMapping(name = "getSellerStatistics")
     public SellerStats getSellerStatistics(@Argument String sellerId) {
@@ -52,5 +63,32 @@ public class SellerResolver {
         }
 
         return new SellerStats(uniqueBuyers.size(), totalPurchases, totalRevenue, purchasedBooks);
+    }
+    
+    @QueryMapping(name = "getSellerSalesAnalytics") 
+    public Map<String, Object> getSellerSalesAnalytics(@Argument String sellerId, @Argument String timeFrame) {
+        return sellerAnalyticsService.getSellerSalesAnalytics(sellerId, timeFrame);
+    }
+    
+    @QueryMapping(name = "getTopSellingProducts")
+    public List<Map<String, Object>> getTopSellingProducts(
+            @Argument String sellerId, 
+            @Argument String timeFrame,
+            @Argument String metric,
+            @Argument Integer limit) {
+        return sellerAnalyticsService.getTopSellingProducts(sellerId, timeFrame, metric, limit);
+    }
+    
+    @QueryMapping(name = "getSalesByCategory")
+    public Map<String, Object> getSalesByCategory(@Argument String sellerId, @Argument String timeFrame) {
+        return sellerAnalyticsService.getSalesByCategory(sellerId, timeFrame);
+    }
+    
+    @QueryMapping(name = "getRevenueOverTime")
+    public Map<String, Object> getRevenueOverTime(
+            @Argument String sellerId, 
+            @Argument String timeFrame,
+            @Argument String groupBy) {
+        return sellerAnalyticsService.getRevenueOverTime(sellerId, timeFrame, groupBy);
     }
 }

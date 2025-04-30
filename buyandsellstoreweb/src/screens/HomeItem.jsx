@@ -939,6 +939,7 @@ const styles = {
     backgroundColor: "#d4edda",
     color: "#155724",
   },
+  
 };
 
 export default HomeItem;

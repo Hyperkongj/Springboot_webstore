@@ -40,6 +40,7 @@ import ProfileScreen from "./screens/ProfileScreen";
 import ManageInventory from "./screens/ManageInventory";
 import Inventory from "./screens/Inventory"; // or "./components/Inventory" if it's under components
 import Revenue from "./screens/Revenue";
+import SalesAnalytics from "./screens/SalesAnalytics";
 
 // Strip __typename before sending variables
 const cleanTypenameLink = new ApolloLink((operation, forward) => {
@@ -109,6 +110,14 @@ const AppRoutes = () => (
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/analytics"
+          element={
+            <ProtectedRoute>
+              <SalesAnalytics />
+            </ProtectedRoute>
+          }
+        />
       <Route
         path="/sellerHome"
         element={
