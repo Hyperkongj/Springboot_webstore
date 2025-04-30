@@ -1,193 +1,109 @@
-type AddressOutput {
-    type: String!
-    street: String!
-    city: String!
-    state: String!
-    zip: Int!
-    country: String!
-}
+# --- INPUT TYPES ---
 
 input Address {
-    type: String
-    street: String
-    city: String
-    state: String
-    zip: Int
-    country: String
+  type: String
+  street: String
+  city: String
+  state: String
+  zip: Int
+  country: String
 }
 
-type Order {
-    id: ID!
-    userId: ID!
-    items: [CartItem!]!
-    totalPrice: Float!
-    createdAt: String!
+input AddressInput {
+  type: String!
+  street: String!
+  city: String!
+  state: String!
+  zip: Int!
+  country: String!
 }
 
 input BookInput {
-    title: String!
-    author: String!
-    price: Float!
-    imageUrl: String!
-    description: String!
-    ratings: Float
-    sellerId: String!
-}
-
-input PaymentInput {
-    cardNumber: String!
-    expiry: String!
-    cvv: String!
+  title: String!
+  author: String!
+  price: Float!
+  imageUrl: String!
+  description: String!
+  ratings: Float
+  sellerId: String!
 }
 
 input CartItemInput {
-    itemId: ID!
-    type: String
-    name: String
-    quantity: Int!
-    price: Float!
-    imageUrl: String!
+  itemId: ID!
+  type: String
+  name: String
+  quantity: Int!
+  price: Float!
+  imageUrl: String!
+}
+
+input PaymentInput {
+  cardNumber: String!
+  expiry: String!
+  cvv: String!
 }
 
 input ReviewInput {
-    reviewer: String!
-    comment: String!
-    rating: Float!
-}
-
-# Wishlist Functionality
-type WishlistItem {
-    id: ID!
-    userId: ID!
-    itemId: ID!
-    type: String!
-    name: String!
-    imageUrl: String!
+  reviewer: String!
+  comment: String!
+  rating: Float!
 }
 
 input WishlistItemInput {
-    userId: ID!
-    itemId: ID!
-    type: String!
-    name: String!
-    imageUrl: String!
+  userId: ID!
+  itemId: ID!
+  type: String!
+  name: String!
+  imageUrl: String!
 }
 
-# Subscription support (optional)
-type Subscription {
-    wishlistItemAdded(userId: ID!): WishlistItem!
-    wishlistItemUpdated(userId: ID!): WishlistItem!
-    wishlistItemRemoved(userId: ID!): ResponseMessage!
-}
+# --- OUTPUT TYPES ---
 
-type Query {
-    hello: String
-    cartItems(id: ID!): [CartItem]
-    book(id: ID!): Book
-    books: [Book!]!
-    getOrdersByUserId(userId: ID!): [Order]
-    wishlistItems(userId: ID!): [WishlistItem!]!
-    wishlistItem(id: ID!): WishlistItem
-    wishlistCount(userId: ID!): Int!
-    homeItems: [HomeItem!]!
-    homeItem(id: ID!): HomeItem
-    getBooksBySellerId(sellerId: String!): [Book!]!
-    getHomeItemsBySellerId(sellerId: String!): [HomeItem!]!
-    getSoldItemsBySellerId(sellerId: String!): [SoldItem!]!
-}
-
-
-type Mutation {
-    login(username: String!, password: String!): AuthResponse
-
-    signup(
-        username: String!
-        email: String!
-        password: String!
-        firstName: String!
-        lastName: String!
-        phone: String!
-        isSeller: Boolean!
-        billing: [Address]
-        shipping: [Address]
-    ): AuthResponse
-
-    addToCart(userId: ID!, itemId: ID!, type: String!): ResponseMessage!
-    removeFromCart(userId: ID!, itemId: ID, type: String): ResponseMessage!
-
-    createOrder(
-        userId: ID!
-        items: [CartItemInput!]!
-        totalPrice: Float!
-        billing: Address
-        shipping: Address
-        payment: PaymentInput!
-    ): OrderResponse!
-
-    addReview(bookId: ID!, review: ReviewInput!): Book!
-    updateReview(bookId: ID!, reviewer: String!, updatedReview: ReviewInput!): Book!
-    deleteReview(bookId: ID!, reviewer: String!): Book!
-
-    addWishlistItem(input: WishlistItemInput!): WishlistItem!
-    updateWishlistItem(input: WishlistItemInput!): WishlistItem!
-    removeWishlistItem(id: ID!): ResponseMessage!
-
-    forgotPassword(email: String!): String
-    resetPassword(token: String!, newPassword: String!): ResetPasswordResponse!
-    
-    # Profile Page
-    updateUser(
-        id: ID!
-        phone: String
-        profilePictureUrl: String
-        billing: [AddressInput]
-        shipping: [AddressInput]
-        primaryBillingIndex: Int
-        primaryShippingIndex: Int
-    ): User
-
-    
-    uploadBook(title: String!
-        author: String!
-        totalQuantity: Int!
-        price: Float!
-        imageUrl: String!
-        description: String!
-        sellerId: String!): UploadBookResponse
-
-    uploadHomeItem(title: String!
-        description: String!
-        totalQuantity: Int!
-        price: Float!
-        imageUrl: String!
-        manufacturer: String!
-        sellerId: String!
-        type: String!
-    ): UploadHomeItemResponse
-}
-
-type UploadBookResponse {
-    success: Boolean!
-    message: String!
-    book: Book
-}
-
-type UploadHomeItemResponse {
-    success: Boolean!
-    message: String!
-    homeItem: HomeItem
+type AddressOutput {
+  type: String!
+  street: String!
+  city: String!
+  state: String!
+  zip: Int!
+  country: String!
 }
 
 type AuthResponse {
-    success: Boolean!
-    message: String!
-    user: User
+  success: Boolean!
+  message: String!
+  user: User
 }
 
 type ResetPasswordResponse {
-    success: Boolean!
-    message: String
+  success: Boolean!
+  message: String
 }
+
+type UploadBookResponse {
+  success: Boolean!
+  message: String!
+  book: Book
+}
+
+type UploadHomeItemResponse {
+  success: Boolean!
+  message: String!
+  homeItem: HomeItem
+}
+
+type ResponseMessage {
+  success: Boolean!
+  message: String!
+}
+
+type OrderResponse {
+  success: Boolean!
+  message: String!
+  order: Order
+  reviews: [Review!]
+}
+
+# --- ENTITIES ---
 
 type User {
   id: ID!
@@ -205,89 +121,188 @@ type User {
 }
 
 type Book {
-    id: ID!
-    title: String!
-    type: String
-    author: String!
-    price: Float!
-    imageUrl: String!
-    description: String
-    ratings: Float!
-    sellerId: String
-    totalQuantity: Int
-    reviews: [Review!]
+  id: ID!
+  title: String!
+  type: String
+  author: String!
+  price: Float!
+  imageUrl: String!
+  description: String
+  ratings: Float!
+  sellerId: String
+  totalQuantity: Int
+  reviews: [Review!]
 }
 
-#type Book {
-#    id: ID!
-#    title: String!
-#    author: String!
-#    price: Float!
-#    imageUrl: String!
-#    description: String
-#    ratings: Float!
-#    reviews: [Review!]
-#}
-
 type HomeItem {
-    id: ID!
-    title: String!
-    type: String!
-    description: String!
-    price: Float!
-    imageUrl: String!
-    manufacturer: String!
-    ratings: Float!
-    reviews: [Review!]
-    sellerId: String!
-    totalQuantity: Int!
+  id: ID!
+  title: String!
+  type: String!
+  description: String!
+  price: Float!
+  imageUrl: String!
+  manufacturer: String!
+  ratings: Float!
+  reviews: [Review!]
+  sellerId: String!
+  totalQuantity: Int!
 }
 
 type CartItem {
-    itemId: ID!
-    type: String
-    name: String
-    quantity: Int
-    price: Float
-    imageUrl: String
+  itemId: ID!
+  type: String
+  name: String
+  quantity: Int
+  price: Float
+  imageUrl: String
+}
+
+type WishlistItem {
+  id: ID!
+  userId: ID!
+  itemId: ID!
+  type: String!
+  name: String!
+  imageUrl: String!
 }
 
 type SoldItem {
-    itemId: ID!
-    type: String!
-    name: String
-    quantity: Int!
-    price: Float!
-    imageUrl: String
-    sellerId: String
-    createdAt: String
+  itemId: ID!
+  type: String!
+  name: String
+  quantity: Int!
+  price: Float!
+  imageUrl: String
+  sellerId: String
+  createdAt: String
 }
 
+type Order {
+  id: ID!
+  userId: ID!
+  items: [CartItem!]!
+  totalPrice: Float!
+  createdAt: String!
+}
 
 type Review {
-    reviewer: String!
-    comment: String!
-    rating: Float!
+  reviewer: String!
+  comment: String!
+  rating: Float!
 }
 
-type ResponseMessage {
-    success: Boolean!
-    message: String!
+# --- QUERIES ---
+
+type Query {
+  hello: String
+
+  # Books
+  books: [Book!]!
+  book(id: ID!): Book
+  getBooksBySellerId(sellerId: String!): [Book!]!
+
+  # Home Items
+  homeItems: [HomeItem!]!
+  homeItem(id: ID!): HomeItem
+  getHomeItemsBySellerId(sellerId: String!): [HomeItem!]!
+  getSoldItemsBySellerId(sellerId: String!): [SoldItem!]!
+
+  # Cart & Orders
+  cartItems(id: ID!): [CartItem]
+  getOrdersByUserId(userId: ID!): [Order]
+
+  # Wishlist
+  wishlistItems(userId: ID!): [WishlistItem!]!
+  wishlistItem(id: ID!): WishlistItem
+  wishlistCount(userId: ID!): Int!
 }
 
-type OrderResponse {
-    success: Boolean!
-    message: String!
-    order: Order
-    reviews: [Review!]
+# --- MUTATIONS ---
+
+type Mutation {
+  login(username: String!, password: String!): AuthResponse
+
+  signup(
+    username: String!
+    email: String!
+    password: String!
+    firstName: String!
+    lastName: String!
+    phone: String!
+    isSeller: Boolean!
+    billing: [Address]
+    shipping: [Address]
+  ): AuthResponse
+
+  addToCart(userId: ID!, itemId: ID!, type: String!): ResponseMessage!
+  removeFromCart(userId: ID!, itemId: ID, type: String): ResponseMessage!
+
+  createOrder(
+    userId: ID!
+    items: [CartItemInput!]!
+    totalPrice: Float!
+    billing: Address
+    shipping: Address
+    payment: PaymentInput!
+  ): OrderResponse!
+
+  # Book Reviews
+  addReview(bookId: ID!, review: ReviewInput!): Book!
+  updateReview(bookId: ID!, reviewer: String!, updatedReview: ReviewInput!): Book!
+  deleteReview(bookId: ID!, reviewer: String!): Book!
+
+  # HomeItem Reviews (NEW & CORRECT)
+  addHomeItemReview(homeItemId: ID!, review: ReviewInput!): HomeItem!
+  updateHomeItemReview(homeItemId: ID!, reviewer: String!, updatedReview: ReviewInput!): HomeItem!
+  deleteHomeItemReview(homeItemId: ID!, reviewer: String!): HomeItem!
+
+  # Wishlist
+  addWishlistItem(input: WishlistItemInput!): WishlistItem!
+  updateWishlistItem(input: WishlistItemInput!): WishlistItem!
+  removeWishlistItem(id: ID!): ResponseMessage!
+
+  # Password
+  forgotPassword(email: String!): String
+  resetPassword(token: String!, newPassword: String!): ResetPasswordResponse!
+
+  # Profile
+  updateUser(
+    id: ID!
+    phone: String
+    profilePictureUrl: String
+    billing: [AddressInput]
+    shipping: [AddressInput]
+    primaryBillingIndex: Int
+    primaryShippingIndex: Int
+  ): User
+
+  # Uploads
+  uploadBook(
+    title: String!
+    author: String!
+    totalQuantity: Int!
+    price: Float!
+    imageUrl: String!
+    description: String!
+    sellerId: String!
+  ): UploadBookResponse
+
+  uploadHomeItem(
+    title: String!
+    description: String!
+    totalQuantity: Int!
+    price: Float!
+    imageUrl: String!
+    manufacturer: String!
+    sellerId: String!
+    type: String!
+  ): UploadHomeItemResponse
 }
 
-input AddressInput {
-  type: String!        # e.g. "HOME", "WORK"
-  street: String!
-  city: String!
-  state: String!
-  zip: Int!
-  country: String!
-}
+# --- SUBSCRIPTIONS (Optional) ---
 
+type Subscription {
+  wishlistItemAdded(userId: ID!): WishlistItem!
+  wishlistItemUpdated(userId: ID!): WishlistItem!
+  wishlistItemRemoved(userId: ID!): ResponseMessage!
+}
