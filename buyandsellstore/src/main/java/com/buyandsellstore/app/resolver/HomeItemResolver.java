@@ -1,8 +1,8 @@
 package com.buyandsellstore.app.resolver;
 
 import com.buyandsellstore.app.dto.UploadHomeItemResponse;
-import com.buyandsellstore.app.model.Book;
 import com.buyandsellstore.app.model.HomeItem;
+import com.buyandsellstore.app.model.Review;
 import com.buyandsellstore.app.service.HomeItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -19,16 +19,6 @@ public class HomeItemResolver {
     @Autowired
     private HomeItemService homeItemService;
 
-    //    UploadHomeItem(title: String!
-//            description: String!
-//            totalQuantity: Int!
-//            price: Float!
-//            imageUrl: String!
-//            manufacturer: String!
-//            sellerId: String!
-//            type: String!
-//    ): Book
-//
     /*this method is only used by user of type seller
     i.e. if isSeller flag for the user is true
     */
@@ -73,5 +63,22 @@ public class HomeItemResolver {
     @QueryMapping
     public List<HomeItem> getHomeItemsBySellerId(@Argument String sellerId) {
         return homeItemService.findBySellerId(sellerId);
+    }
+    
+    // New mutations for reviews - updated to match schema naming
+    
+    @MutationMapping
+    public HomeItem addHomeItemReview(@Argument String homeItemId, @Argument Review review) {
+        return homeItemService.addReview(homeItemId, review);
+    }
+
+    @MutationMapping
+    public HomeItem updateHomeItemReview(@Argument String homeItemId, @Argument String reviewer, @Argument Review updatedReview) {
+        return homeItemService.updateReview(homeItemId, reviewer, updatedReview);
+    }
+
+    @MutationMapping
+    public HomeItem deleteHomeItemReview(@Argument String homeItemId, @Argument String reviewer) {
+        return homeItemService.deleteReview(homeItemId, reviewer);
     }
 }
