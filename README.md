@@ -154,3 +154,112 @@ Create a .env file in the frontend directory with the following variables:
 REACT_APP_API_URL=http://localhost:8080
 REACT_APP_GRAPHQL_URL=http://localhost:8080/graphql
 </details>
+📱 Screenshots
+<div align="center">
+  <table>
+    <tr>
+      <td><img src="https://raw.githubusercontent.com/raihanrms/Storage/main/ecommerce-home.png" alt="Home Screen" width="100%"></td>
+      <td><img src="https://raw.githubusercontent.com/raihanrms/Storage/main/ecommerce-product.png" alt="Product Details" width="100%"></td>
+    </tr>
+    <tr>
+      <td><img src="https://raw.githubusercontent.com/raihanrms/Storage/main/ecommerce-cart.png" alt="Shopping Cart" width="100%"></td>
+      <td><img src="https://raw.githubusercontent.com/raihanrms/Storage/main/ecommerce-dashboard.png" alt="Seller Dashboard" width="100%"></td>
+    </tr>
+  </table>
+</div>
+📊 API Documentation
+Our GraphQL API provides a flexible way to query and manipulate data. Here are some key operations:
+<details>
+<summary>Authentication</summary>
+graphql# User Login
+mutation Login($username: String!, $password: String!) {
+  login(username: $username, password: $password) {
+    success
+    message
+    user {
+      id
+      username
+      email
+      firstName
+      lastName
+      isSeller
+    }
+  }
+}
+
+# User Registration
+mutation Signup(
+  $username: String!,
+  $email: String!,
+  $password: String!,
+  $firstName: String!,
+  $lastName: String!,
+  $phone: String!,
+  $isSeller: Boolean!
+) {
+  signup(
+    username: $username,
+    email: $email,
+    password: $password,
+    firstName: $firstName,
+    lastName: $lastName,
+    phone: $phone,
+    isSeller: $isSeller
+  ) {
+    success
+    message
+    user {
+      id
+      username
+    }
+  }
+}
+</details>
+<details>
+<summary>Products</summary>
+graphql# Query All Books
+query GetBooks {
+  books {
+    id
+    title
+    author
+    price
+    imageUrl
+    ratings
+  }
+}
+
+# Query Home Items
+query GetHomeItems {
+  homeItems {
+    id
+    title
+    price
+    imageUrl
+    manufacturer
+    ratings
+  }
+}
+</details>
+<details>
+<summary>Shopping Cart</summary>
+graphql# Add to Cart
+mutation AddToCart($userId: ID!, $itemId: ID!, $type: String!) {
+  addToCart(userId: $userId, itemId: $itemId, type: $type) {
+    success
+    message
+  }
+}
+
+# View Cart
+query GetCartItems($userId: ID!) {
+  cartItems(id: $userId) {
+    itemId
+    type
+    name
+    quantity
+    price
+    imageUrl
+  }
+}
+</details>
