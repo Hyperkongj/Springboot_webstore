@@ -1,3 +1,4 @@
+
 # 🛒 Buy & Sell Store: E-Commerce Platform
 
 <div align="center">
@@ -129,15 +130,18 @@ cd buyandsellstore
 
 # Build and run with Maven
 mvn clean install
-cd target
-java -jar latest snapshot file something like  
+mvn spring-boot:run
 
 # The server will start on http://localhost:8080
+```
 
 </details>
+
 <details>
 <summary>Frontend Setup</summary>
-bash# Navigate to frontend directory
+
+```bash
+# Navigate to frontend directory
 cd buyandsellstoreweb
 
 # Install dependencies
@@ -147,14 +151,24 @@ npm install
 npm start
 
 # The application will be available at http://localhost:3000
+```
+
 </details>
+
 <details>
 <summary>Environment Configuration</summary>
-Create a .env file in the frontend directory with the following variables:
+
+Create a `.env` file in the frontend directory with the following variables:
+
+```
 REACT_APP_API_URL=http://localhost:8080
 REACT_APP_GRAPHQL_URL=http://localhost:8080/graphql
+```
+
 </details>
-📱 Screenshots
+
+## 📱 Screenshots
+
 <div align="center">
   <table>
     <tr>
@@ -167,11 +181,16 @@ REACT_APP_GRAPHQL_URL=http://localhost:8080/graphql
     </tr>
   </table>
 </div>
-📊 API Documentation
+
+## 📊 API Documentation
+
 Our GraphQL API provides a flexible way to query and manipulate data. Here are some key operations:
+
 <details>
 <summary>Authentication</summary>
-graphql# User Login
+
+```graphql
+# User Login
 mutation Login($username: String!, $password: String!) {
   login(username: $username, password: $password) {
     success
@@ -214,10 +233,15 @@ mutation Signup(
     }
   }
 }
+```
+
 </details>
+
 <details>
 <summary>Products</summary>
-graphql# Query All Books
+
+```graphql
+# Query All Books
 query GetBooks {
   books {
     id
@@ -240,10 +264,15 @@ query GetHomeItems {
     ratings
   }
 }
+```
+
 </details>
+
 <details>
 <summary>Shopping Cart</summary>
-graphql# Add to Cart
+
+```graphql
+# Add to Cart
 mutation AddToCart($userId: ID!, $itemId: ID!, $type: String!) {
   addToCart(userId: $userId, itemId: $itemId, type: $type) {
     success
@@ -262,4 +291,63 @@ query GetCartItems($userId: ID!) {
     imageUrl
   }
 }
+```
+
 </details>
+
+## 🧪 Testing
+
+The project includes comprehensive test coverage:
+
+- Backend: JUnit 5 tests with Mockito for services and controllers
+- Frontend: React Testing Library for component tests
+
+```bash
+# Run backend tests
+cd buyandsellstore
+mvn test
+
+# Run frontend tests
+cd buyandsellstoreweb
+npm test
+```
+
+## 🤝 Contributors
+
+<div align="center">
+  <a href="https://github.com/contributor1">
+    <img src="https://github.com/identicons/contributor1.png" width="50px" alt="Contributor 1" style="border-radius:50%"/>
+  </a>
+  <a href="https://github.com/contributor2">
+    <img src="https://github.com/identicons/contributor2.png" width="50px" alt="Contributor 2" style="border-radius:50%"/>
+  </a>
+  <a href="https://github.com/contributor3">
+    <img src="https://github.com/identicons/contributor3.png" width="50px" alt="Contributor 3" style="border-radius:50%"/>
+  </a>
+</div>
+
+## 📜 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+  <p>
+    <a href="https://github.com/yourusername/buyandsellstore/issues/new">Report Bug</a> •
+    <a href="https://github.com/yourusername/buyandsellstore/issues/new">Request Feature</a>
+  </p>
+  
+  <p>Made with ❤️ by Group 3 - CS5394 Software Development</p>
+  
+  <p>
+    <a href="https://github.com/yourusername/buyandsellstore/stargazers">
+      <img src="https://img.shields.io/github/stars/yourusername/buyandsellstore?style=social" alt="Stars">
+    </a>
+    <a href="https://github.com/yourusername/buyandsellstore/network/members">
+      <img src="https://img.shields.io/github/forks/yourusername/buyandsellstore?style=social" alt="Forks">
+    </a>
+  </p>
+</div>
+```
+
