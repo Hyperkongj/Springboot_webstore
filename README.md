@@ -133,3 +133,24 @@ cd target
 java -jar latest snapshot file something like  
 
 # The server will start on http://localhost:8080
+
+</details>
+<details>
+<summary>Frontend Setup</summary>
+bash# Navigate to frontend directory
+cd buyandsellstoreweb
+
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+
+# The application will be available at http://localhost:3000
+</details>
+<details>
+<summary>Environment Configuration</summary>
+Create a .env file in the frontend directory with the following variables:
+REACT_APP_API_URL=http://localhost:8080
+REACT_APP_GRAPHQL_URL=http://localhost:8080/graphql
+</details>
