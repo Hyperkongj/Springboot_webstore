@@ -18,7 +18,7 @@
 
 <img src="https://raw.githubusercontent.com/raihanrms/Storage/main/ecommerce-banner.png" alt="Platform Showcase" width="100%">
 
-## ✨ Fea tures
+## ✨ Features
 
 <div align="center">
   <table>
