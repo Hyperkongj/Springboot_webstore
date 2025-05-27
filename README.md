@@ -10,7 +10,7 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-4.4+-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
 [![GraphQL](https://img.shields.io/badge/GraphQL-API-E10098?style=flat-square&logo=graphql&logoColor=white)](https://graphql.org/)
 
-*A modern e-commerce platform for  buying and selling books and home items *
+*A modern e-commerce platform for  buying and selling books and home items*
 
 [Features](#features) • [Tech Stack](#tech-stack) • [Architecture](#architecture) • [Demo](#live-demo) • [Installation](#installation) • [Screenshots](#screenshots) • [API Documentation](#api-documentation) • [Contributors](#contributors)
 
