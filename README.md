@@ -1,5 +1,5 @@
 
-# 🛒 Buy & Sell Store: E-Commerce Platform
+# 🛒 Buy & Sell Store : E-Commerce Platform
 
 <div align="center">
   
